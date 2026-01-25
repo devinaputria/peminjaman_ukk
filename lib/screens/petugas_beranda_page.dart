@@ -6,12 +6,16 @@ class PetugasBerandaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Peminjaman')),
+      appBar: AppBar(
+        title: const Text('Pengajuan Peminjaman'),
+        centerTitle: true,
+      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: 2,
         itemBuilder: (context, index) {
           return Card(
+            elevation: 4,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -21,39 +25,79 @@ class PetugasBerandaPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
-                    children: [
-                      Icon(Icons.person),
-                      SizedBox(width: 8),
+                  // ================= PEMINJAM =================
+                  Row(
+                    children: const [
+                      CircleAvatar(
+                        backgroundColor: Colors.blue,
+                        child: Icon(Icons.person, color: Colors.white),
+                      ),
+                      SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Depina',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text('XII TPM 1'),
+                          Text(
+                            'Depina',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          Text(
+                            'XII TPM 1',
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ],
                       )
                     ],
                   ),
-                  const Divider(),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Alat\nMesin Bor'),
-                      Text('Kategori\nMesin'),
-                    ],
-                  ),
+
                   const SizedBox(height: 12),
+                  const Divider(),
+
+                  // ================= INFO ALAT =================
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      OutlinedButton(
-                        onPressed: () {},
-                        child: const Text('Tolak'),
+                      infoChip(
+                        icon: Icons.build,
+                        label: 'Mesin Bor',
                       ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text('Setuju'),
+                      infoChip(
+                        icon: Icons.category,
+                        label: 'Mesin',
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ================= AKSI =================
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.close),
+                          label: const Text('Tolak'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            side: const BorderSide(color: Colors.red),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.check),
+                          label: const Text('Setuju'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
                       ),
                     ],
                   )
@@ -63,6 +107,15 @@ class PetugasBerandaPage extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  // ================= WIDGET CHIP =================
+  static Widget infoChip({required IconData icon, required String label}) {
+    return Chip(
+      avatar: Icon(icon, size: 18),
+      label: Text(label),
+      backgroundColor: Colors.blue.shade50,
     );
   }
 }
