@@ -15,13 +15,14 @@ class PeminjamDashboard extends StatefulWidget {
 class _PeminjamDashboardState extends State<PeminjamDashboard> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    PeminjamBerandaPage(),
-    AlatPage(),
-    PeminjamanPage(),
-    RiwayatPage(),
-    PeminjamProfilPage(),
+  final List<Widget> _screens = [
+    const PeminjamBerandaPage(),
+    const AlatPage(),
+    const PeminjamanPage(),
+    const RiwayatPage(),
+    const PeminjamProfilPage(),
   ];
+
 
   @override
   Widget build(BuildContext context) {

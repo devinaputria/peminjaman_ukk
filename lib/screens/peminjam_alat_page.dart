@@ -10,16 +10,16 @@ class AlatPage extends StatefulWidget {
 class _AlatPageState extends State<AlatPage> {
   int selectedKategori = 0; // 0 = semua
 
-  // SIMULASI DATA DARI DATABASE
   final List<Map<String, dynamic>> alatList = [
-    {'nama': 'Mesin Bor', 'harga': 20000, 'kategori': 1},
-    {'nama': 'Mesin Bubut', 'harga': 50000, 'kategori': 1},
-    {'nama': 'Mesin Frais', 'harga': 60000, 'kategori': 1},
-    {'nama': 'Jangka Sorong', 'harga': 15000, 'kategori': 2},
-    {'nama': 'Mikrometer Luar', 'harga': 20000, 'kategori': 2},
-    {'nama': 'Kacamata Safety', 'harga': 5000, 'kategori': 3},
-    {'nama': 'Sarung Tangan', 'harga': 3000, 'kategori': 3},
-  ];
+  {'nama': 'Mesin Bor', 'kategori': 1},
+  {'nama': 'Mesin Bubut', 'kategori': 1},
+  {'nama': 'Mesin Frais', 'kategori': 1},
+  {'nama': 'Jangka Sorong', 'kategori': 2},
+  {'nama': 'Mikrometer Luar', 'kategori': 2},
+  {'nama': 'Kacamata Safety', 'kategori': 3},
+  {'nama': 'Sarung Tangan', 'kategori': 3},
+];
+
 
   @override
   Widget build(BuildContext context) {

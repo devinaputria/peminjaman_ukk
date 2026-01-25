@@ -6,55 +6,70 @@ class PetugasLaporanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Laporan Peminjaman'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Judul
-            const Text(
-              'LAPORAN PEMINJAMAN ALAT',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      backgroundColor: const Color(0xFFFDF6E9),
+      body: Column(
+        children: [
+          // ===== HEADER =====
+          Container(
+            height: 130,
+            width: double.infinity,
+            padding: const EdgeInsets.only(left: 16, bottom: 20),
+            alignment: Alignment.bottomLeft,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2C4F8A),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(24),
+              ),
             ),
-            const SizedBox(height: 4),
-            const Text('Periode: Januari 2026'),
-            const Divider(height: 32),
+            child: const Text(
+              'Laporan Peminjaman',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
 
-            // Tabel dummy
-            Expanded(
+          // ===== LIST LAPORAN =====
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: ListView(
                 children: const [
-                  _LaporanItem(
-                    no: '1',
-                    alat: 'Kamera Canon',
+                  LaporanCard(
+                    alat: 'Sarung Tangan',
                     peminjam: 'Andi',
                     status: 'Kembali',
                   ),
-                  _LaporanItem(
-                    no: '2',
-                    alat: 'Tripod',
-                    peminjam: 'Siti',
+                  LaporanCard(
+                    alat: 'Mesin Bor',
+                    peminjam: 'Depi',
                     status: 'Dipinjam',
                   ),
-                  _LaporanItem(
-                    no: '3',
-                    alat: 'Laptop Asus',
+                  LaporanCard(
+                    alat: 'Mesin Bubut',
                     peminjam: 'Budi',
                     status: 'Kembali',
                   ),
                 ],
               ),
             ),
+          ),
 
-            const SizedBox(height: 12),
-
-            // Tombol cetak (dummy)
-            SizedBox(
+          // ===== TOMBOL CETAK =====
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  backgroundColor: const Color(0xFF2C4F8A),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -65,24 +80,23 @@ class PetugasLaporanPage extends StatelessWidget {
                 icon: const Icon(Icons.print),
                 label: const Text('Cetak Laporan'),
               ),
-            )
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ================= ITEM LAPORAN =================
+// ================= CARD LAPORAN =================
 
-class _LaporanItem extends StatelessWidget {
-  final String no;
+class LaporanCard extends StatelessWidget {
   final String alat;
   final String peminjam;
   final String status;
 
-  const _LaporanItem({
-    required this.no,
+  const LaporanCard({
+    super.key,
     required this.alat,
     required this.peminjam,
     required this.status,
@@ -90,18 +104,63 @@ class _LaporanItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListTile(
-        leading: CircleAvatar(child: Text(no)),
-        title: Text(alat),
-        subtitle: Text('Peminjam: $peminjam'),
-        trailing: Text(
-          status,
-          style: TextStyle(
-            color: status == 'Dipinjam' ? Colors.red : Colors.green,
-            fontWeight: FontWeight.bold,
+    final bool isKembali = status == 'Kembali';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
-        ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            backgroundColor: Color(0xFFE3F2FD),
+            child: Icon(Icons.person, color: Colors.blue),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  alat,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Peminjam : $peminjam',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Text(
+            status,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isKembali ? Colors.green : Colors.orange,
+            ),
+          ),
+        ],
       ),
     );
   }

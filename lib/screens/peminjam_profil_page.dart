@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peminjaman/screens/peminjam_detail_profil_page.dart';
 
 class PeminjamProfilPage extends StatelessWidget {
   const PeminjamProfilPage({super.key});
@@ -16,7 +17,6 @@ class PeminjamProfilPage extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
 
-            // FOTO
             const CircleAvatar(
               radius: 45,
               backgroundColor: Colors.blue,
@@ -27,25 +27,26 @@ class PeminjamProfilPage extends StatelessWidget {
 
             const Text(
               'Devina Putri Aurellia',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              'Peminjam',
-              style: TextStyle(color: Colors.grey),
-            ),
+            const Text('Peminjam', style: TextStyle(color: Colors.grey)),
 
             const SizedBox(height: 30),
 
-            // MENU PROFIL
             ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit Profil'),
+              leading: const Icon(Icons.person),
+              title: const Text('Detail & Edit Profil'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const PeminjamProfilDetailPage(),
+                  ),
+                );
+              },
             ),
+
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
               title: const Text('Logout'),
