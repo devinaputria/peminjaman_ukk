@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:peminjaman/screens/user_crud_page.dart';
+import 'package:peminjaman/screens/alat_crud_page.dart';
+import 'package:peminjaman/screens/kategori_crud_page.dart';
+
 
 class EditMenuScreen extends StatelessWidget {
   const EditMenuScreen({super.key});
@@ -22,7 +25,7 @@ class EditMenuScreen extends StatelessWidget {
       body: ListView.builder(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: menus.length,
-        itemBuilder: (_, i) {
+        itemBuilder: (context, i) {
           return Card(
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 8),
@@ -41,7 +44,6 @@ class EditMenuScreen extends StatelessWidget {
               ),
               trailing: const Icon(Icons.chevron_right, size: 28),
               onTap: () {
-                // ================== NAVIGASI CRUD ==================
                 if (menus[i]['label'] == 'User') {
                   Navigator.push(
                     context,
@@ -49,11 +51,21 @@ class EditMenuScreen extends StatelessWidget {
                       builder: (_) => const UserCrudPage(),
                     ),
                   );
+                } else if (menus[i]['label'] == 'Alat') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AlatCrudPage(),
+                    ),
+                  );
+                } else if (menus[i]['label'] == 'Kategori') {
+                  Navigator.push(
+                    context,
+                      MaterialPageRoute(
+                        builder: (_) => const KategoriCrudPage()
+                    ),
+                  );
                 }
-
-                // NANTI LANJUT
-                // if (menus[i]['label'] == 'Alat') {}
-                // if (menus[i]['label'] == 'Kategori') {}
               },
             ),
           );
