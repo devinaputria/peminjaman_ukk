@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/supabase_service.dart';
 
 class UserCrudPage extends StatefulWidget {
   const UserCrudPage({super.key});
@@ -8,203 +10,124 @@ class UserCrudPage extends StatefulWidget {
 }
 
 class _UserCrudPageState extends State<UserCrudPage> {
-  // ================= DATA DUMMY USER =================
-  final List<Map<String, String>> users = [
-    {'nama': 'Andi', 'role': 'Peminjam'},
-    {'nama': 'Budi', 'role': 'Petugas'},
-    {'nama': 'Admin', 'role': 'Admin'},
-  ];
+  final supabase = Supabase.instance.client;
 
-  // ================= FORM CONTROLLER =================
-  final TextEditingController namaController = TextEditingController();
-  String selectedRole = 'Peminjam';
+  List users = [];
+  bool loading = true;
 
-  final List<String> roles = ['Peminjam', 'Petugas', 'Admin'];
+  final namaController = TextEditingController();
+  final usernameController = TextEditingController();
+  final roleController = TextEditingController();
 
-  // ================= TAMBAH / EDIT USER =================
-  void showUserForm({int? index}) {
-    if (index != null) {
-      namaController.text = users[index]['nama']!;
-      selectedRole = users[index]['role']!;
+  @override
+  void initState() {
+    super.initState();
+    fetchUsers();
+  }
+
+  // ================= GET =================
+  Future<void> fetchUsers() async {
+    final data = await supabase.from('users').select();
+    setState(() {
+      users = data;
+      loading = false;
+    });
+  }
+
+  // ================= INSERT & UPDATE =================
+  void showForm({Map? user}) {
+    if (user != null) {
+      namaController.text = user['nama'];
+      usernameController.text = user['username'];
+      roleController.text = user['role'];
     } else {
       namaController.clear();
-      selectedRole = 'Peminjam';
+      usernameController.clear();
+      roleController.clear();
     }
 
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      builder: (_) => AlertDialog(
+        title: Text(user == null ? 'Tambah User' : 'Edit User'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: namaController, decoration: const InputDecoration(labelText: 'Nama')),
+            TextField(controller: usernameController, decoration: const InputDecoration(labelText: 'Username')),
+            TextField(controller: roleController, decoration: const InputDecoration(labelText: 'Role')),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          ElevatedButton(
+            child: const Text('Simpan'),
+            onPressed: () async {
+              if (user == null) {
+                await supabase.from('users').insert({
+                  'nama': namaController.text,
+                  'username': usernameController.text,
+                  'role': roleController.text,
+                });
+              } else {
+                await supabase.from('users').update({
+                  'nama': namaController.text,
+                  'username': usernameController.text,
+                  'role': roleController.text,
+                }).eq('id', user['id']);
+              }
+
+              Navigator.pop(context);
+              fetchUsers();
+            },
+          ),
+        ],
       ),
-      builder: (_) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                index == null ? 'Tambah User' : 'Edit User',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // ===== INPUT NAMA =====
-              TextField(
-                controller: namaController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama User',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // ===== DROPDOWN ROLE =====
-              DropdownButtonFormField<String>(
-                value: selectedRole,
-                items: roles
-                    .map(
-                      (role) => DropdownMenuItem(
-                        value: role,
-                        child: Text(role),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (value) {
-                  setState(() => selectedRole = value!);
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Role',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // ===== BUTTON =====
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      if (index == null) {
-                        users.add({
-                          'nama': namaController.text,
-                          'role': selectedRole,
-                        });
-                      } else {
-                        users[index] = {
-                          'nama': namaController.text,
-                          'role': selectedRole,
-                        };
-                      }
-                    });
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Simpan'),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
-  // ================= HAPUS USER =================
-  void deleteUser(int index) {
-    setState(() {
-      users.removeAt(index);
-    });
+  // ================= DELETE =================
+  Future<void> deleteUser(String id) async {
+    await supabase.from('users').delete().eq('id', id);
+    fetchUsers();
   }
 
   // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-
-      // ===== HEADER =====
-      body: Column(
-        children: [
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(24),
-              ),
-            ),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Manajemen User',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'Tambah, edit, dan hapus user',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // ===== LIST USER =====
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+      appBar: AppBar(
+        title: const Text('CRUD User'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => showForm(),
+        child: const Icon(Icons.add),
+      ),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              padding: const EdgeInsets.all(16),
               itemCount: users.length,
-              itemBuilder: (_, index) {
+              itemBuilder: (_, i) {
+                final user = users[i];
                 return Card(
-                  elevation: 2,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.blue.shade100,
-                      child: const Icon(Icons.person, color: Colors.blue),
-                    ),
-                    title: Text(
-                      users[index]['nama']!,
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Text(users[index]['role']!),
+                    title: Text(user['nama']),
+                    subtitle: Text('Role: ${user['role']}'),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon:
-                              const Icon(Icons.edit, color: Colors.orange),
-                          onPressed: () =>
-                              showUserForm(index: index),
+                          icon: const Icon(Icons.edit, color: Colors.orange),
+                          onPressed: () => showForm(user: user),
                         ),
                         IconButton(
-                          icon:
-                              const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => deleteUser(index),
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => deleteUser(user['id']),
                         ),
                       ],
                     ),
@@ -212,15 +135,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
                 );
               },
             ),
-          ),
-        ],
-      ),
-
-      // ===== FAB =====
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showUserForm(),
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
