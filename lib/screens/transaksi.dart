@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'admin_pengembalian.dart';
+import 'admin_peminjaman.dart'; // kalau kamu punya
+// atau halaman list peminjaman admin kamu
 
 class TransaksiPage extends StatelessWidget {
   const TransaksiPage({super.key});
@@ -22,8 +25,6 @@ class TransaksiPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
-
             const Text(
               'TRANSAKSI',
               style: TextStyle(
@@ -31,26 +32,38 @@ class TransaksiPage extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
-
             const SizedBox(height: 12),
 
+            /// ===== PEMINJAMAN =====
             transaksiItem(
               context,
               icon: Icons.assignment,
               title: 'Peminjaman',
               onTap: () {
-                Navigator.pushNamed(context, '/peminjaman');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AdminPengembalianPage(),
+                    // GANTI kalau halaman peminjaman beda
+                  ),
+                );
               },
             ),
 
             const SizedBox(height: 12),
 
+            /// ===== PENGEMBALIAN =====
             transaksiItem(
               context,
               icon: Icons.assignment_return,
               title: 'Pengembalian',
               onTap: () {
-                Navigator.pushNamed(context, '/pengembalian');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AdminPengembalianPage(),
+                  ),
+                );
               },
             ),
           ],
