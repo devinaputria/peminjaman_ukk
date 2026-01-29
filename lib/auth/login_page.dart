@@ -9,7 +9,7 @@ class LoginScreen extends StatelessWidget {
     final usernameController = TextEditingController();
     final passwordController = TextEditingController();
     return Scaffold(
-      backgroundColor: AppColors.sidebar, // ← INI PENTING
+      backgroundColor: AppColors.sidebar, 
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),

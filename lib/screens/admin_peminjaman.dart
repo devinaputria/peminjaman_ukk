@@ -7,16 +7,6 @@ class PeminjamanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E7),
-      appBar: AppBar(
-        backgroundColor: Colors.blue.shade700,
-        toolbarHeight: 120,
-        centerTitle: true,
-        title: const Text(
-          'Peminjaman',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

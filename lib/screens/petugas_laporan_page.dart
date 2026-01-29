@@ -6,7 +6,6 @@ class PetugasLaporanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFDF6E9),
       body: Column(
         children: [
           // ===== HEADER =====

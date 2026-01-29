@@ -7,7 +7,6 @@ class AdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Dashboard'), backgroundColor: Colors.blue, toolbarHeight: 200,),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: GridView.count(

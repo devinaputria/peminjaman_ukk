@@ -6,13 +6,6 @@ class RiwayatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E1),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF2A5191),
-        toolbarHeight: 180,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

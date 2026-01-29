@@ -6,10 +6,6 @@ class PetugasPratinjauPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pratinjau'),
-        backgroundColor: Colors.blue,
-      ),
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: 2,
