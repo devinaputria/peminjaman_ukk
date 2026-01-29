@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'petugas_beranda_page.dart';
 import 'petugas_pratinjau_page.dart';
 import 'petugas_laporan_page.dart';
@@ -15,10 +16,10 @@ class PetugasDashboard extends StatefulWidget {
 class _PetugasDashboardState extends State<PetugasDashboard> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const PetugasBerandaPage(),
-    const PetugasPratinjauPage(),
-    const PetugasLaporanPage(),
+  final List<Widget> _screens = const [
+    PetugasBerandaPage(),
+    PetugasPratinjauPage(),
+    PetugasLaporanPage(),
   ];
 
   // ================= LOGOUT =================
@@ -37,32 +38,36 @@ class _PetugasDashboardState extends State<PetugasDashboard> {
   // ================= APPBAR CUSTOM =================
   PreferredSizeWidget _buildAppBar() {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(5000), // cocok figma
+      preferredSize: const Size.fromHeight(176),
       child: Container(
+        height: 176, // ⭐ INI YANG DITAMBAHKAN
         decoration: const BoxDecoration(
-          color: Color(0xFF1E88E5),
+          color: Color(0xFF1E40AF),
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(60),
             bottomRight: Radius.circular(60),
           ),
         ),
         child: SafeArea(
+          bottom: false,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Icon(Icons.arrow_back, color: Colors.white),
-
+                const Icon(
+                  Icons.build_circle,
+                  color: Colors.white,
+                  size: 30,
+                ),
                 const Text(
                   'Dashboard Petugas',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 IconButton(
                   icon: const Icon(Icons.logout, color: Colors.white),
                   onPressed: () => logout(context),
@@ -79,7 +84,7 @@ class _PetugasDashboardState extends State<PetugasDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(), // 🔥 sama seperti admin
+      appBar: _buildAppBar(),
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
@@ -89,6 +94,7 @@ class _PetugasDashboardState extends State<PetugasDashboard> {
         onTap: (index) {
           setState(() => _currentIndex = index);
         },
+        selectedItemColor: const Color(0xFF1E40AF),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

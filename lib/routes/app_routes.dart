@@ -15,7 +15,7 @@ class AppRoutes {
   static const profilDetail = '/profil-detail';
 
   static Map<String, WidgetBuilder> routes = {
-    login: (_) => const LoginScreen(),
+    login: (_) => const LoginPage(),
     admin: (_) => const AdminDashboard(),
     petugas: (_) => const PetugasDashboard(),
     peminjam: (_) => const PeminjamDashboard(),
