@@ -1,28 +1,48 @@
 import 'package:flutter/material.dart';
+import 'peminjam_riwayat_page.dart';
+import 'peminjam_beranda_page.dart';
+import 'peminjam_alat_page.dart';
+import 'peminjam_peminjaman_page.dart';
+import 'peminjam_profil_page.dart';
+import '../widgets/peminjam_bottom_nav.dart'; // import navbar
 
-class PeminjamBottomNav extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
+class PeminjamDashboard extends StatefulWidget {
+  const PeminjamDashboard({super.key});
 
-  const PeminjamBottomNav({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
+  @override
+  State<PeminjamDashboard> createState() => _PeminjamDashboardState();
+}
+
+class _PeminjamDashboardState extends State<PeminjamDashboard> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const PeminjamBerandaPage(),
+    const AlatPage(),             // halaman alat
+    const PeminjamanPage(selectedAlat: []), // halaman peminjaman
+    const PeminjamRiwayatPage(),  // halaman riwayat
+    const PeminjamProfilPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      type: BottomNavigationBarType.fixed,
-      onTap: onTap,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-        BottomNavigationBarItem(icon: Icon(Icons.build), label: 'Alat'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Peminjaman'),
-        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Dashboard Peminjam'),
+        centerTitle: true,
+      ),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: _screens,
+      ),
+      bottomNavigationBar: PeminjamBottomNav(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
     );
   }
 }
