@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'peminjam_riwayat_page.dart';
-import 'peminjam_beranda_page.dart';
-import 'peminjam_alat_page.dart';
-import 'peminjam_peminjaman_page.dart';
-import 'peminjam_profil_page.dart';
-import '../widgets/peminjam_bottom_nav.dart'; // import navbar
+import '../widgets/peminjam_bottom_nav.dart'; // pastikan file navbar sudah ada
 
 class PeminjamDashboard extends StatefulWidget {
   const PeminjamDashboard({super.key});
@@ -16,12 +11,13 @@ class PeminjamDashboard extends StatefulWidget {
 class _PeminjamDashboardState extends State<PeminjamDashboard> {
   int _currentIndex = 0;
 
+  // Halaman sederhana untuk tiap tab
   final List<Widget> _screens = [
-    const PeminjamBerandaPage(),
-    const AlatPage(),             // halaman alat
-    const PeminjamanPage(selectedAlat: []), // halaman peminjaman
-    const PeminjamRiwayatPage(),  // halaman riwayat
-    const PeminjamProfilPage(),
+    Center(child: Text('Beranda Peminjam', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Halaman Alat', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Halaman Peminjaman', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Riwayat Peminjaman', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Profil Peminjam', style: TextStyle(fontSize: 24))),
   ];
 
   @override

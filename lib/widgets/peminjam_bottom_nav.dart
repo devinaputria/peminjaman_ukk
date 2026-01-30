@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PeminjamBottomNav extends StatelessWidget {
   final int currentIndex;
-  final Function(int) onTap;
+  final ValueChanged<int> onTap;
 
   const PeminjamBottomNav({
     super.key,
@@ -14,12 +14,15 @@ class PeminjamBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: currentIndex,
-      type: BottomNavigationBarType.fixed,
       onTap: onTap,
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      selectedItemColor: Colors.indigo,
+      unselectedItemColor: Colors.grey,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-        BottomNavigationBarItem(icon: Icon(Icons.build), label: 'Alat'),
-        BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Peminjaman'),
+        BottomNavigationBarItem(icon: Icon(Icons.hardware), label: 'Alat'),
+        BottomNavigationBarItem(icon: Icon(Icons.swap_horiz), label: 'Peminjaman'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil'),
       ],
