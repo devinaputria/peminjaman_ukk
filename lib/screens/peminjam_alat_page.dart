@@ -29,18 +29,13 @@ class _AlatPageState extends State<AlatPage> {
         : alatList
             .where((alat) => alat['kategori'] == selectedKategori)
             .toList();
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daftar Alat'),
-        backgroundColor: Colors.blue.shade700,
-        toolbarHeight: 100,
-      ),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            // SEARCH
+
+             // SEARCH
             TextField(
               decoration: InputDecoration(
                 hintText: 'Cari alat...',

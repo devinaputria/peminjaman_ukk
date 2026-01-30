@@ -1,32 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:peminjaman/screens/riwayat_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'petugas_beranda_page.dart';
-import 'petugas_pratinjau_page.dart';
-import 'petugas_laporan_page.dart';
+import 'peminjam_beranda_page.dart';
+import 'peminjam_alat_page.dart';
+import 'peminjam_peminjaman_page.dart';
+import 'peminjam_riwayat_page.dart';
+import 'peminjam_profil_page.dart';
 import '../routes/app_routes.dart';
 
-class PetugasDashboard extends StatefulWidget {
-  const PetugasDashboard({super.key});
+
+class PeminjamDashboard extends StatefulWidget {
+  const PeminjamDashboard({super.key});
 
   @override
-  State<PetugasDashboard> createState() => _PetugasDashboardState();
+  State<PeminjamDashboard> createState() => _PeminjamDashboardState();
 }
 
-class _PetugasDashboardState extends State<PetugasDashboard> {
+class _PeminjamDashboardState extends State<PeminjamDashboard> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    PetugasBerandaPage(),
-    PetugasPratinjauPage(),
-    PetugasLaporanPage(),
+  final List<Widget> _screens = [
+    const PeminjamBerandaPage(),
+    const AlatPage(),
+    const PeminjamanPage(),
+    const RiwayatPage(),
+    const PeminjamProfilPage(),
   ];
 
   // ================= LOGOUT =================
-  Future<void> logout(BuildContext context) async {
+  Future<void> _logout() async {
     await Supabase.instance.client.auth.signOut();
 
-    if (!context.mounted) return;
+    if (!mounted) return;
 
     Navigator.pushNamedAndRemoveUntil(
       context,
@@ -35,81 +40,75 @@ class _PetugasDashboardState extends State<PetugasDashboard> {
     );
   }
 
-  // ================= APPBAR CUSTOM =================
-  PreferredSizeWidget _buildAppBar() {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(176),
-      child: Container(
-        height: 176, // ⭐ INI YANG DITAMBAHKAN
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E40AF),
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(60),
-            bottomRight: Radius.circular(60),
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Icon(
-                  Icons.build_circle,
-                  color: Colors.white,
-                  size: 30,
-                ),
-                const Text(
-                  'Dashboard Petugas',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.white),
-                  onPressed: () => logout(context),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(),
+      // ✅ APPBAR UTAMA + LOGOUT
+      appBar: AppBar(
+        title: Text(_getTitle()),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: _logout,
+          ),
+        ],
+      ),
+
+      // ================= BODY =================
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
+
+      // ================= BOTTOM NAV =================
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() => _currentIndex = index);
-        },
-        selectedItemColor: const Color(0xFF1E40AF),
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Beranda',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.preview),
-            label: 'Pratinjau',
+            icon: Icon(Icons.build),
+            label: 'Alat',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Laporan',
+            icon: Icon(Icons.assignment),
+            label: 'Peminjaman',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Riwayat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profil',
           ),
         ],
       ),
     );
+  }
+
+  // ================= JUDUL APPBAR =================
+  String _getTitle() {
+    switch (_currentIndex) {
+      case 0:
+        return 'Beranda';
+      case 1:
+        return 'Alat';
+      case 2:
+        return 'Peminjaman';
+      case 3:
+        return 'Riwayat';
+      case 4:
+        return 'Profil';
+      default:
+        return '';
+    }
   }
 }

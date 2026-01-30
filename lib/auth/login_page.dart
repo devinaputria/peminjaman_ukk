@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:peminjaman/screens/peminjam_beranda_page.dart';
+import 'package:peminjaman/screens/petugas_beranda_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../screens/admin_dashboard.dart';
@@ -57,12 +59,12 @@ class _LoginPageState extends State<LoginPage> {
       } else if (role == 'petugas') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const PetugasDashboard()),
+          MaterialPageRoute(builder: (_) => const PetugasBerandaPage()),
         );
       } else if (role == 'peminjam') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const PeminjamDashboard()),
+          MaterialPageRoute(builder: (_) => const PeminjamBerandaPage()),
         );
       } else {
         throw 'Role tidak dikenali';
