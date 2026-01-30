@@ -22,7 +22,7 @@ class _PeminjamDashboardState extends State<PeminjamDashboard> {
   final List<Widget> _screens = [
     const PeminjamBerandaPage(),
     const AlatPage(),
-    const PeminjamanPage(),
+    const PeminjamBerandaPage(),
     const RiwayatPage(),
     const PeminjamProfilPage(),
   ];

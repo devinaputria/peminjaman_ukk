@@ -15,13 +15,12 @@ class PeminjamDashboard extends StatefulWidget {
 class _PeminjamDashboardState extends State<PeminjamDashboard> {
   int _currentIndex = 0;
 
-  // ❌ Jangan pakai const agar perubahan terlihat
   final List<Widget> _screens = [
-    PeminjamBerandaPage(),
-    AlatPage(),
-    PeminjamanPage(),
-    PeminjamRiwayatPage(),
-    PeminjamProfilPage(),
+    const PeminjamBerandaPage(),
+    const AlatPage(),            // pakai UI lama peminjam
+    const PeminjamDashboard(),      // halaman peminjaman lama
+    const PeminjamRiwayatPage(), // riwayat lama
+    const PeminjamProfilPage(),
   ];
 
   @override
