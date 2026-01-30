@@ -1,36 +1,34 @@
 import 'package:flutter/material.dart';
-import '../widgets/peminjam_bottom_nav.dart'; // pastikan file navbar sudah ada
+import '../widgets/peminjam_bottom_nav.dart'; // <- path fix
+import 'peminjam_beranda_page.dart';
+import 'peminjam_alat_page.dart';
+import 'peminjam_peminjaman_page.dart';
+import 'peminjam_riwayat_page.dart';
+import 'peminjam_profil_page.dart';
 
-class PeminjamDashboard extends StatefulWidget {
-  const PeminjamDashboard({super.key});
+class PeminjamDashboardPage extends StatefulWidget {
+  const PeminjamDashboardPage({super.key});
 
   @override
-  State<PeminjamDashboard> createState() => _PeminjamDashboardState();
+  State<PeminjamDashboardPage> createState() =>
+      _PeminjamDashboardPageState();
 }
 
-class _PeminjamDashboardState extends State<PeminjamDashboard> {
+class _PeminjamDashboardPageState extends State<PeminjamDashboardPage> {
   int _currentIndex = 0;
 
-  // Halaman sederhana untuk tiap tab
-  final List<Widget> _screens = [
-    Center(child: Text('Beranda Peminjam', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Halaman Alat', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Halaman Peminjaman', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Riwayat Peminjaman', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Profil Peminjam', style: TextStyle(fontSize: 24))),
+  final List<Widget> _pages = [
+    const PeminjamBerandaPage(),
+    const AlatPage(),
+    const PeminjamanPage(selectedAlat: []), // <- fix parameter
+    const PeminjamRiwayatPage(),
+    const PeminjamProfilPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard Peminjam'),
-        centerTitle: true,
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: _pages[_currentIndex],
       bottomNavigationBar: PeminjamBottomNav(
         currentIndex: _currentIndex,
         onTap: (index) {

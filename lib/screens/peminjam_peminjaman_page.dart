@@ -1,103 +1,122 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PeminjamanPage extends StatefulWidget {
-  final List<Map<String, dynamic>> selectedAlat;
-  const PeminjamanPage({super.key, required this.selectedAlat});
+  const PeminjamanPage({super.key});
 
   @override
   State<PeminjamanPage> createState() => _PeminjamanPageState();
 }
 
 class _PeminjamanPageState extends State<PeminjamanPage> {
-  final supabase = Supabase.instance.client;
-  final Map<int, TextEditingController> jumlahControllers = {};
+  final TextEditingController jumlahController = TextEditingController();
   final TextEditingController tanggalController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    for (var alat in widget.selectedAlat) {
-      jumlahControllers[alat['id']] = TextEditingController(text: '1');
-    }
-  }
+  String selectedAlat = 'Mesin Bor';
+  int hargaPerItem = 20000;
 
   @override
   void dispose() {
-    for (var c in jumlahControllers.values) c.dispose();
+    jumlahController.dispose();
     tanggalController.dispose();
     super.dispose();
-  }
-
-  Future<void> submitPeminjaman() async {
-    for (var alat in widget.selectedAlat) {
-      final jumlah = int.tryParse(jumlahControllers[alat['id']]!.text) ?? 1;
-      await supabase.from('peminjaman').insert({
-        'alat_id': alat['id'],
-        'jumlah': jumlah,
-        'tanggal_pengembalian': tanggalController.text,
-        'status': 'menunggu',
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Peminjaman berhasil diajukan!')),
-    );
-    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Peminjaman')),
+      appBar: AppBar(
+        title: const Text('Peminjaman'),
+        backgroundColor: Colors.blue[800],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Form Pengajuan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            const Text(
+              'Form Pengajuan',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 20),
+
+            // Nama Alat + Harga
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text('$selectedAlat\nRp $hargaPerItem/item'),
+            ),
+
             const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
-                children: [
-                  for (var alat in widget.selectedAlat)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(alat['nama'], style: const TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 6),
-                          Text('Denda: Rp ${alat['denda']}'),
-                          TextField(
-                            controller: jumlahControllers[alat['id']],
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              labelText: 'Jumlah',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                        ],
-                      ),
+
+            // Jumlah
+            TextField(
+              controller: jumlahController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Jumlah',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Tanggal Pengembalian
+            TextField(
+              controller: tanggalController,
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Tanggal Pengembalian',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                suffixIcon: const Icon(Icons.calendar_today),
+              ),
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now().add(const Duration(days: 1)),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2100),
+                );
+
+                if (pickedDate != null) {
+                  setState(() {
+                    tanggalController.text =
+                        '${pickedDate.day}-${pickedDate.month}-${pickedDate.year}';
+                  });
+                }
+              },
+            ),
+
+            const SizedBox(height: 24),
+
+            // Tombol Ajukan Peminjaman
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                          'Pengajuan $selectedAlat (${jumlahController.text} item) berhasil!'),
                     ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: tanggalController,
-                    decoration: const InputDecoration(
-                      labelText: 'Tanggal Pengembalian',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: submitPeminjaman,
-                      child: const Text('Ajukan Peminjaman'),
-                    ),
-                  )
-                ],
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[800],
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text(
+                  'Ajukan Peminjaman',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
           ],

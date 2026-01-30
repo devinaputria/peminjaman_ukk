@@ -1,112 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:peminjaman/screens/riwayat_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'peminjam_beranda_page.dart';
-import 'peminjam_alat_page.dart';
-import 'peminjam_peminjaman_page.dart';
-import 'peminjam_riwayat_page.dart';
-import 'peminjam_profil_page.dart';
-import '../routes/app_routes.dart';
+import 'petugas_beranda_page.dart';
+import 'petugas_pratinjau_page.dart';
+import 'petugas_laporan_page.dart';
 
-
-class PeminjamDashboard extends StatefulWidget {
-  const PeminjamDashboard({super.key});
+class PetugasDashboard extends StatefulWidget {
+  const PetugasDashboard({super.key});
 
   @override
-  State<PeminjamDashboard> createState() => _PeminjamDashboardState();
+  State<PetugasDashboard> createState() => _PetugasDashboardState();
 }
 
-class _PeminjamDashboardState extends State<PeminjamDashboard> {
+class _PetugasDashboardState extends State<PetugasDashboard> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const PeminjamBerandaPage(),
-    const AlatPage(),
-    const PeminjamBerandaPage(),
-    const RiwayatPage(),
-    const PeminjamProfilPage(),
+    const PetugasBerandaPage(),
+    const PetugasPratinjauPage(),
+    const PetugasLaporanPage(),
   ];
-
-  // ================= LOGOUT =================
-  Future<void> _logout() async {
-    await Supabase.instance.client.auth.signOut();
-
-    if (!mounted) return;
-
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      AppRoutes.login,
-      (route) => false,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ✅ APPBAR UTAMA + LOGOUT
       appBar: AppBar(
         title: Text(_getTitle()),
         centerTitle: true,
-        backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Logout',
-            onPressed: _logout,
-          ),
-        ],
       ),
-
-      // ================= BODY =================
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
-
-      // ================= BOTTOM NAV =================
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) => setState(() => _currentIndex = index),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Beranda',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.build),
-            label: 'Alat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assignment),
-            label: 'Peminjaman',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Riwayat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Pratinjau'),
+          BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Laporan'),
         ],
       ),
     );
   }
 
-  // ================= JUDUL APPBAR =================
   String _getTitle() {
     switch (_currentIndex) {
       case 0:
         return 'Beranda';
       case 1:
-        return 'Alat';
+        return 'Pratinjau';
       case 2:
-        return 'Peminjaman';
-      case 3:
-        return 'Riwayat';
-      case 4:
-        return 'Profil';
+        return 'Laporan';
       default:
         return '';
     }
