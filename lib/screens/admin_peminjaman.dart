@@ -42,7 +42,6 @@ class PeminjamanPage extends StatelessWidget {
                 child: Icon(Icons.person),
               ),
               const SizedBox(width: 16),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +61,6 @@ class PeminjamanPage extends StatelessWidget {
                   ],
                 ),
               ),
-
               Column(
                 children: const [
                   Text(

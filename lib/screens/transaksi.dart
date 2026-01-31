@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'admin_pengembalian.dart';
- 
 
 class TransaksiPage extends StatelessWidget {
   const TransaksiPage({super.key});
@@ -8,32 +7,22 @@ class TransaksiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E7),
-      appBar: AppBar(
-        title: const Text(
-          'Transaksi',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.blue.shade700,
-        toolbarHeight: 120,
-        centerTitle: true,
-        elevation: 0,
-      ),
+      backgroundColor: const Color(0xFFFFF8E7), // cream background
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'TRANSAKSI',
+              'Pilih jenis transaksi',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
 
-            /// ===== PEMINJAMAN =====
+            // PEMINJAMAN
             transaksiItem(
               context,
               icon: Icons.assignment,
@@ -47,10 +36,9 @@ class TransaksiPage extends StatelessWidget {
                 );
               },
             ),
-
             const SizedBox(height: 12),
 
-            /// ===== PENGEMBALIAN =====
+            // PENGEMBALIAN
             transaksiItem(
               context,
               icon: Icons.assignment_return,
@@ -83,15 +71,16 @@ class TransaksiPage extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        elevation: 2,
+        elevation: 3,
+        shadowColor: Colors.grey.shade300,
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 24,
                 backgroundColor: Colors.blue.shade100,
-                child: Icon(icon, color: Colors.blue.shade700),
+                child: Icon(icon, color: Colors.blue.shade700, size: 28),
               ),
               const SizedBox(width: 16),
               Expanded(

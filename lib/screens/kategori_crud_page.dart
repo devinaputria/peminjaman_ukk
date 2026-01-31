@@ -22,36 +22,48 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
     fetchKategori();
   }
 
-  // ================= GET =================
+  // ================= GET DATA =================
   Future<void> fetchKategori() async {
     setState(() => loading = true);
+
     try {
-      final data = await supabase.from('kategori').select().order('id', ascending: true);
+      final data = await supabase
+          .from('kategori')
+          .select()
+          .order('id', ascending: true);
+
       setState(() {
         kategoriList = List<Map<String, dynamic>>.from(data);
         loading = false;
       });
+
     } catch (e) {
       setState(() => loading = false);
-      print('Error fetch kategori: $e');
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal mengambil data kategori')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
 
-  // ================= TAMBAH / EDIT =================
+  // ================= FORM TAMBAH / EDIT =================
   void showForm({Map<String, dynamic>? kategori}) {
-    kategoriController.text = kategori?['nama'] ?? '';
+
+    // 👉 SESUAI KOLOM SUPABASE = nama_kategori
+    kategoriController.text = kategori?['nama_kategori'] ?? '';
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+
         title: Text(
           kategori == null ? 'Tambah Kategori' : 'Edit Kategori',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
+
         content: TextField(
           controller: kategoriController,
           decoration: const InputDecoration(
@@ -59,28 +71,44 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
             border: OutlineInputBorder(),
           ),
         ),
+
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Batal'),
           ),
+
           ElevatedButton(
             onPressed: () async {
-              if (kategoriController.text.isEmpty) return;
+
+              if (kategoriController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Nama kategori wajib diisi'),
+                  ),
+                );
+                return;
+              }
 
               try {
+
+                // ===== TAMBAH =====
                 if (kategori == null) {
                   await supabase.from('kategori').insert({
-                    'nama': kategoriController.text,
+                    'nama_kategori': kategoriController.text,
                   });
-                } else {
+
+                } 
+                // ===== EDIT =====
+                else {
                   await supabase.from('kategori').update({
-                    'nama': kategoriController.text,
+                    'nama_kategori': kategoriController.text,
                   }).eq('id', kategori['id']);
                 }
 
                 Navigator.pop(context);
                 fetchKategori();
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
@@ -90,10 +118,10 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
                     ),
                   ),
                 );
+
               } catch (e) {
-                print('Error simpan kategori: $e');
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Gagal menyimpan kategori')),
+                  SnackBar(content: Text('Gagal: $e')),
                 );
               }
             },
@@ -104,18 +132,20 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
     );
   }
 
-  // ================= HAPUS =================
+  // ================= DELETE =================
   void deleteKategori(dynamic id) async {
     try {
       await supabase.from('kategori').delete().eq('id', id);
+
       fetchKategori();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Kategori berhasil dihapus')),
       );
+
     } catch (e) {
-      print('Error hapus kategori: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal menghapus kategori')),
+        SnackBar(content: Text('Gagal hapus: $e')),
       );
     }
   }
@@ -128,58 +158,72 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
         title: const Text('CRUD Kategori'),
         backgroundColor: Colors.blue,
         centerTitle: true,
-        elevation: 3,
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () => showForm(),
         backgroundColor: Colors.blue,
-        child: const Icon(Icons.add, size: 28),
+        child: const Icon(Icons.add),
       ),
+
       body: loading
           ? const Center(child: CircularProgressIndicator())
+
           : kategoriList.isEmpty
               ? const Center(
                   child: Text(
                     'Belum ada kategori',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    style: TextStyle(color: Colors.grey),
                   ),
                 )
+
               : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.all(12),
                   itemCount: kategoriList.length,
+
                   itemBuilder: (context, index) {
                     final kategori = kategoriList[index];
+
                     return Card(
-                      elevation: 3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      margin: const EdgeInsets.symmetric(vertical: 6),
+
                       child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         leading: CircleAvatar(
                           backgroundColor: Colors.blue.shade100,
-                          child: const Icon(Icons.category, color: Colors.blue),
+                          child: const Icon(Icons.category,
+                              color: Colors.blue),
                         ),
+
+                        // 👉 TAMPIL SESUAI KOLOM
                         title: Text(
-                          kategori['nama'] ?? '',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                        ),
-                        trailing: SizedBox(
-                          width: 96,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.orange),
-                                onPressed: () => showForm(kategori: kategori),
-                              ),
-                              IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => deleteKategori(kategori['id']),
-                              ),
-                            ],
+                          kategori['nama_kategori'] ?? '',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+
+                            IconButton(
+                              icon: const Icon(Icons.edit,
+                                  color: Colors.orange),
+
+                              onPressed: () =>
+                                  showForm(kategori: kategori),
+                            ),
+
+                            IconButton(
+                              icon: const Icon(Icons.delete,
+                                  color: Colors.red),
+
+                              onPressed: () =>
+                                  deleteKategori(kategori['id']),
+                            ),
+                          ],
                         ),
                       ),
                     );

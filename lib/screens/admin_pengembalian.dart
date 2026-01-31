@@ -7,15 +7,54 @@ class AdminPengembalianPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      backgroundColor: const Color(0xFFFFF8E7), // cream background
+      body: Column(
         children: [
-          _peminjamanItem(
-            context,
-            nama: 'Depina',
-            kelas: 'XI TPM 1',
-            alat: 'Mesin Bor',
-            status: 'Dipinjam',
+          // ===== HEADER CUSTOM =====
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
+            color: const Color(0xFF2A5191), // warna AppBar Figma
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                const SizedBox(width: 12),
+                const Text(
+                  'Peminjaman',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ===== LIST PEMINJAMAN =====
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                _peminjamanItem(
+                  context,
+                  nama: 'Depina',
+                  kelas: 'XI TPM 1',
+                  alat: 'Mesin Bor',
+                  status: 'Dipinjam',
+                ),
+                const SizedBox(height: 12),
+                _peminjamanItem(
+                  context,
+                  nama: 'Andi',
+                  kelas: 'XI RPL 2',
+                  alat: 'Obeng',
+                  status: 'Kembali',
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -29,6 +68,9 @@ class AdminPengembalianPage extends StatelessWidget {
     required String alat,
     required String status,
   }) {
+    Color statusColor =
+        status.toLowerCase() == 'dipinjam' ? Colors.orange : Colors.green;
+
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
@@ -43,6 +85,7 @@ class AdminPengembalianPage extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
+        elevation: 3,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -59,6 +102,7 @@ class AdminPengembalianPage extends StatelessWidget {
                       nama,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
                     Text(kelas),
@@ -67,14 +111,17 @@ class AdminPengembalianPage extends StatelessWidget {
                 ),
               ),
               Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     status,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: Colors.orange,
+                      fontWeight: FontWeight.bold,
+                      color: statusColor,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   const Icon(Icons.chevron_right),
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserCrudPage extends StatefulWidget {
   const UserCrudPage({super.key});
@@ -8,75 +9,168 @@ class UserCrudPage extends StatefulWidget {
 }
 
 class _UserCrudPageState extends State<UserCrudPage> {
-  List<Map<String, dynamic>> users = [
-    {'id': 1, 'nama': 'Devina', 'role': 'Admin'},
-    {'id': 2, 'nama': 'vina', 'role': 'Peminjam'},
-  ];
+  final supabase = Supabase.instance.client;
 
+  List<Map<String, dynamic>> users = [];
   bool loading = false;
-  bool connected = true; // dummy connected
 
   final namaController = TextEditingController();
-  final roleController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  String role = 'peminjam';
 
-  // ================= INSERT & UPDATE =================
+  final List<String> roleList = ['admin', 'petugas', 'peminjam'];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUser();
+  }
+
+  // ================= GET USER =================
+  Future<void> fetchUser() async {
+    setState(() => loading = true);
+
+    try {
+      final data = await supabase
+          .from('user')
+          .select()
+          .order('created_at', ascending: false);
+
+      setState(() {
+        users = List<Map<String, dynamic>>.from(data);
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal load user: $e')),
+      );
+    }
+  }
+
+  // ================= FORM =================
   void showForm({Map<String, dynamic>? user}) {
     if (user != null) {
-      namaController.text = user['nama'];
-      roleController.text = user['role'];
+      namaController.text = user['nama'] ?? '';
+      emailController.text = user['username'] ?? '';
+      role = user['role'] ?? 'peminjam';
     } else {
       namaController.clear();
-      roleController.clear();
+      emailController.clear();
+      passwordController.clear();
+      role = 'peminjam';
     }
 
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(user == null ? 'Tambah User' : 'Edit User'),
         content: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: namaController,
-                decoration: const InputDecoration(labelText: 'Nama'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Nama tidak boleh kosong' : null,
-              ),
-              TextFormField(
-                controller: roleController,
-                decoration: const InputDecoration(labelText: 'Role'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Role tidak boleh kosong' : null,
-              ),
-            ],
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+                TextFormField(
+                  controller: namaController,
+                  decoration: const InputDecoration(labelText: 'Nama'),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Nama wajib diisi' : null,
+                ),
+
+                const SizedBox(height: 10),
+
+                TextFormField(
+                  controller: emailController,
+                  decoration: const InputDecoration(labelText: 'Email'),
+                  validator: (v) =>
+                      v == null || v.isEmpty ? 'Email wajib diisi' : null,
+                ),
+
+                const SizedBox(height: 10),
+
+                // PASSWORD HANYA SAAT TAMBAH
+                if (user == null)
+                  TextFormField(
+                    controller: passwordController,
+                    decoration: const InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                    validator: (v) => v == null || v.length < 6
+                        ? 'Minimal 6 karakter'
+                        : null,
+                  ),
+
+                const SizedBox(height: 10),
+
+                DropdownButtonFormField<String>(
+                  value: role,
+                  decoration: const InputDecoration(labelText: 'Role'),
+                  items: roleList.map((r) {
+                    return DropdownMenuItem(
+                      value: r,
+                      child: Text(r.toUpperCase()),
+                    );
+                  }).toList(),
+                  onChanged: (v) {
+                    setState(() {
+                      role = v!;
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
         ),
+
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Batal')),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Batal'),
+          ),
+
           ElevatedButton(
             child: const Text('Simpan'),
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                setState(() {
-                  if (user == null) {
-                    users.add({
-                      'id': users.isEmpty ? 1 : users.last['id'] + 1,
-                      'nama': namaController.text,
-                      'role': roleController.text,
-                    });
-                  } else {
-                    user['nama'] = namaController.text;
-                    user['role'] = roleController.text;
-                  }
-                });
+
+            onPressed: () async {
+              if (!formKey.currentState!.validate()) return;
+
+              try {
+                // ============ TAMBAH USER ============
+                if (user == null) {
+
+                  // 1. BUAT AUTH DULU
+                  final auth = await supabase.auth.signUp(
+                    email: emailController.text,
+                    password: passwordController.text,
+                  );
+
+                  final userId = auth.user!.id;
+
+                  // 2. SIMPAN KE TABEL USER
+                  await supabase.from('user').insert({
+                    'id': userId,
+                    'nama': namaController.text,
+                    'username': emailController.text,
+                    'role': role,
+                  });
+                }
+
+                // ============ EDIT USER ============
+                else {
+                  await supabase.from('user').update({
+                    'nama': namaController.text,
+                    'username': emailController.text,
+                    'role': role,
+                  }).eq('id', user['id']);
+                }
 
                 Navigator.pop(context);
+                fetchUser();
+
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(user == null
@@ -84,22 +178,34 @@ class _UserCrudPageState extends State<UserCrudPage> {
                         : 'User berhasil diupdate'),
                   ),
                 );
+
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Gagal simpan: $e')),
+                );
               }
             },
-          ),
+          )
         ],
       ),
     );
   }
 
   // ================= DELETE =================
-  void deleteUser(Map<String, dynamic> user) {
-    setState(() {
-      users.removeWhere((u) => u['id'] == user['id']);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('User berhasil dihapus')),
-    );
+  Future<void> deleteUser(String id) async {
+    try {
+      await supabase.from('user').delete().eq('id', id);
+
+      fetchUser();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User berhasil dihapus')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal hapus: $e')),
+      );
+    }
   }
 
   // ================= UI =================
@@ -107,31 +213,14 @@ class _UserCrudPageState extends State<UserCrudPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            const Text('CRUD User'),
-            const Spacer(),
-            Icon(
-              connected ? Icons.check_circle : Icons.error,
-              color: connected ? Colors.greenAccent : Colors.redAccent,
-              size: 18,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              connected ? 'Connected' : 'Disconnected',
-              style: const TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        title: const Text('Manajemen User'),
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () => showForm(),
         child: const Icon(Icons.add),
       ),
+
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
@@ -139,10 +228,18 @@ class _UserCrudPageState extends State<UserCrudPage> {
               itemCount: users.length,
               itemBuilder: (_, i) {
                 final user = users[i];
+
                 return Card(
                   child: ListTile(
-                    title: Text(user['nama']),
-                    subtitle: Text('Role: ${user['role']}'),
+                    title: Text(user['nama'] ?? ''),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Email: ${user['username']}'),
+                        Text('Role: ${user['role']}'),
+                      ],
+                    ),
+
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -150,9 +247,10 @@ class _UserCrudPageState extends State<UserCrudPage> {
                           icon: const Icon(Icons.edit, color: Colors.orange),
                           onPressed: () => showForm(user: user),
                         ),
+
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => deleteUser(user),
+                          onPressed: () => deleteUser(user['id']),
                         ),
                       ],
                     ),

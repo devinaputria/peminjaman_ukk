@@ -26,27 +26,19 @@ class EditMenuScreen extends StatelessWidget {
       },
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Column(
+    return Container(
+      color: const Color(0xFFFFF8E7), // cream background
+      child: Column(
         children: [
-          // ===== HEADER =====
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(20, 60, 20, 30),
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(24),
-              ),
-            ),
+          const SizedBox(height: 20), // jarak atas agar tidak mepet
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text(
                   'Edit Master Data',
                   style: TextStyle(
-                    color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -55,15 +47,14 @@ class EditMenuScreen extends StatelessWidget {
                 Text(
                   'Kelola data utama aplikasi',
                   style: TextStyle(
-                    color: Colors.white70,
                     fontSize: 14,
+                    color: Colors.black54,
                   ),
                 ),
+                SizedBox(height: 20),
               ],
             ),
           ),
-
-          const SizedBox(height: 20),
 
           // ===== GRID MENU =====
           Expanded(
@@ -98,7 +89,7 @@ class EditMenuScreen extends StatelessWidget {
                         Icon(
                           menus[i]['icon'] as IconData,
                           size: 48,
-                          color: Colors.blue,
+                          color: const Color(0xFF2A5191), // biru konsisten
                         ),
                         const SizedBox(height: 12),
                         Text(
