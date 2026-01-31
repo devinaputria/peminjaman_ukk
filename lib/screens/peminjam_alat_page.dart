@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AlatPage extends StatelessWidget {
   const AlatPage({super.key});
 
-  // Dummy data alat
+  //data alat
   final List<Map<String, dynamic>> alatList = const [
     {
       "id": 1,
@@ -133,7 +133,6 @@ class AlatPage extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // TODO: aksi pinjam alat
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                               content: Text('Pinjam ${alat["nama_mesin"]}')),

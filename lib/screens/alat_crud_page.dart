@@ -123,10 +123,11 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF7E0),
+      backgroundColor: const Color(0xFFFFF8E1), // cream background
       floatingActionButton: FloatingActionButton(
         onPressed: () => _tambahEditAlat(),
         child: const Icon(Icons.add),
+        backgroundColor: const Color(0xFF2A5191), // biru
       ),
       body: Column(
         children: [
@@ -135,10 +136,8 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
             decoration: const BoxDecoration(
-              color: Color(0xFF2E5B9F),
-              borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
+              color: Color(0xFF2A5191), // biru konsisten
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,32 +172,42 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
           Expanded(
             child: loading
                 ? const Center(child: CircularProgressIndicator())
-                : ListView.builder(
+                : ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: alatList.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (_, i) {
                       final alat = alatList[i];
                       return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        elevation: 3,
                         child: ListTile(
-                          leading: const CircleAvatar(
-                            backgroundColor: Color(0xFF2E5B9F),
-                            child: Icon(Icons.build, color: Colors.white),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          leading: CircleAvatar(
+                            backgroundColor: const Color(0xFF2A5191),
+                            child: const Icon(Icons.build, color: Colors.white),
                           ),
-                          title: Text(alat['nama'] ?? ''),
+                          title: Text(
+                            alat['nama'] ?? '',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           subtitle: Text('Kategori: ${alat['kategori'] ?? ''}'),
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.orange),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.orange),
                                 onPressed: () => _tambahEditAlat(alat: alat),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () => _hapusAlat(alat['id']),
                               ),
                             ],

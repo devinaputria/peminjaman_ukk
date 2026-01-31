@@ -47,7 +47,11 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(kategori == null ? 'Tambah Kategori' : 'Edit Kategori'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          kategori == null ? 'Tambah Kategori' : 'Edit Kategori',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         content: TextField(
           controller: kategoriController,
           decoration: const InputDecoration(
@@ -79,9 +83,11 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
                 fetchKategori();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(kategori == null
-                        ? 'Kategori berhasil ditambah'
-                        : 'Kategori berhasil diupdate'),
+                    content: Text(
+                      kategori == null
+                          ? 'Kategori berhasil ditambah'
+                          : 'Kategori berhasil diupdate',
+                    ),
                   ),
                 );
               } catch (e) {
@@ -121,42 +127,64 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
       appBar: AppBar(
         title: const Text('CRUD Kategori'),
         backgroundColor: Colors.blue,
+        centerTitle: true,
+        elevation: 3,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showForm(),
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.blue,
+        child: const Icon(Icons.add, size: 28),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: kategoriList.length,
-              itemBuilder: (context, index) {
-                final kategori = kategoriList[index];
-                return Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          : kategoriList.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Belum ada kategori',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
                   ),
-                  child: ListTile(
-                    leading: const Icon(Icons.category, color: Colors.blue),
-                    title: Text(kategori['nama'] ?? ''),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.orange),
-                          onPressed: () => showForm(kategori: kategori),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  itemCount: kategoriList.length,
+                  itemBuilder: (context, index) {
+                    final kategori = kategoriList[index];
+                    return Card(
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.blue.shade100,
+                          child: const Icon(Icons.category, color: Colors.blue),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => deleteKategori(kategori['id']),
+                        title: Text(
+                          kategori['nama'] ?? '',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                        trailing: SizedBox(
+                          width: 96,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.orange),
+                                onPressed: () => showForm(kategori: kategori),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => deleteKategori(kategori['id']),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

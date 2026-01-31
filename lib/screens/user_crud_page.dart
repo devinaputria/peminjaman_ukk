@@ -13,6 +13,7 @@ class _UserCrudPageState extends State<UserCrudPage> {
 
   List users = [];
   bool loading = true;
+  bool connected = false; // status koneksi
 
   final namaController = TextEditingController();
   final usernameController = TextEditingController();
@@ -21,7 +22,18 @@ class _UserCrudPageState extends State<UserCrudPage> {
   @override
   void initState() {
     super.initState();
+    checkConnection();
     fetchUsers();
+  }
+
+  // ================= CEK KONEKSI =================
+  Future<void> checkConnection() async {
+    try {
+      final result = await supabase.from('users').select().limit(1);
+      setState(() => connected = true);
+    } catch (e) {
+      setState(() => connected = false);
+    }
   }
 
   // ================= GET =================
@@ -35,7 +47,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
       });
     } catch (e) {
       setState(() => loading = false);
-      print('Error fetch users: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Gagal mengambil data users')),
       );
@@ -119,7 +130,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
                     ),
                   );
                 } catch (e) {
-                  print('Error simpan user: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Gagal menyimpan user')),
                   );
@@ -141,7 +151,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
         const SnackBar(content: Text('User berhasil dihapus')),
       );
     } catch (e) {
-      print('Error delete user: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Gagal menghapus user')),
       );
@@ -153,7 +162,22 @@ class _UserCrudPageState extends State<UserCrudPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CRUD User'),
+        title: Row(
+          children: [
+            const Text('CRUD User'),
+            const Spacer(),
+            Icon(
+              connected ? Icons.check_circle : Icons.error,
+              color: connected ? Colors.greenAccent : Colors.redAccent,
+              size: 18,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              connected ? 'Connected' : 'Disconnected',
+              style: const TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
