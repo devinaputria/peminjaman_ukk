@@ -20,7 +20,7 @@ class _PeminjamDashboardPageState extends State<PeminjamDashboardPage> {
   final List<Widget> _pages = [
     const PeminjamBerandaPage(),
     const AlatPage(),
-    const PeminjamanPage(selectedAlat: []), // <- fix parameter
+    const PeminjamanPage(), // <- fix parameter
     const PeminjamRiwayatPage(),
     const PeminjamProfilPage(),
   ];

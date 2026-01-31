@@ -31,6 +31,6 @@ class AppRoutes {
    alat: (_) => const AlatPage(),                      // halaman alat
     profilDetail: (_) => const PeminjamProfilDetailPage(),
     riwayat: (_) => const PeminjamRiwayatPage(),
-    peminjaman: (_) => const PeminjamanPage(selectedAlat: []), // halaman peminjaman
+    peminjaman: (_) => const PeminjamanPage() // halaman peminjaman
   };
 }
