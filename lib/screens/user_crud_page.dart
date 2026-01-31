@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class UserCrudPage extends StatefulWidget {
   const UserCrudPage({super.key});
@@ -9,59 +8,24 @@ class UserCrudPage extends StatefulWidget {
 }
 
 class _UserCrudPageState extends State<UserCrudPage> {
-  final supabase = Supabase.instance.client;
+  List<Map<String, dynamic>> users = [
+    {'id': 1, 'nama': 'Devina', 'role': 'Admin'},
+    {'id': 2, 'nama': 'vina', 'role': 'Peminjam'},
+  ];
 
-  List users = [];
-  bool loading = true;
-  bool connected = false; // status koneksi
+  bool loading = false;
+  bool connected = true; // dummy connected
 
   final namaController = TextEditingController();
-  final usernameController = TextEditingController();
   final roleController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    checkConnection();
-    fetchUsers();
-  }
-
-  // ================= CEK KONEKSI =================
-  Future<void> checkConnection() async {
-    try {
-      final result = await supabase.from('users').select().limit(1);
-      setState(() => connected = true);
-    } catch (e) {
-      setState(() => connected = false);
-    }
-  }
-
-  // ================= GET =================
-  Future<void> fetchUsers() async {
-    setState(() => loading = true);
-    try {
-      final data = await supabase.from('users').select();
-      setState(() {
-        users = data;
-        loading = false;
-      });
-    } catch (e) {
-      setState(() => loading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal mengambil data users')),
-      );
-    }
-  }
-
   // ================= INSERT & UPDATE =================
-  void showForm({Map? user}) {
+  void showForm({Map<String, dynamic>? user}) {
     if (user != null) {
       namaController.text = user['nama'];
-      usernameController.text = user['username'];
       roleController.text = user['role'];
     } else {
       namaController.clear();
-      usernameController.clear();
       roleController.clear();
     }
 
@@ -83,12 +47,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
                     value == null || value.isEmpty ? 'Nama tidak boleh kosong' : null,
               ),
               TextFormField(
-                controller: usernameController,
-                decoration: const InputDecoration(labelText: 'Username'),
-                validator: (value) =>
-                    value == null || value.isEmpty ? 'Username tidak boleh kosong' : null,
-              ),
-              TextFormField(
                 controller: roleController,
                 decoration: const InputDecoration(labelText: 'Role'),
                 validator: (value) =>
@@ -103,37 +61,29 @@ class _UserCrudPageState extends State<UserCrudPage> {
               child: const Text('Batal')),
           ElevatedButton(
             child: const Text('Simpan'),
-            onPressed: () async {
+            onPressed: () {
               if (_formKey.currentState!.validate()) {
-                try {
+                setState(() {
                   if (user == null) {
-                    await supabase.from('users').insert({
+                    users.add({
+                      'id': users.isEmpty ? 1 : users.last['id'] + 1,
                       'nama': namaController.text,
-                      'username': usernameController.text,
                       'role': roleController.text,
                     });
                   } else {
-                    await supabase.from('users').update({
-                      'nama': namaController.text,
-                      'username': usernameController.text,
-                      'role': roleController.text,
-                    }).eq('id', user['id']);
+                    user['nama'] = namaController.text;
+                    user['role'] = roleController.text;
                   }
+                });
 
-                  Navigator.pop(context);
-                  fetchUsers();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(user == null
-                          ? 'User berhasil ditambah'
-                          : 'User berhasil diupdate'),
-                    ),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Gagal menyimpan user')),
-                  );
-                }
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(user == null
+                        ? 'User berhasil ditambah'
+                        : 'User berhasil diupdate'),
+                  ),
+                );
               }
             },
           ),
@@ -142,22 +92,17 @@ class _UserCrudPageState extends State<UserCrudPage> {
     );
   }
 
-  // === DELETE ===
-  Future<void> deleteUser(dynamic id) async {
-    try {
-      await supabase.from('users').delete().eq('id', id);
-      fetchUsers();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User berhasil dihapus')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal menghapus user')),
-      );
-    }
+  // ================= DELETE =================
+  void deleteUser(Map<String, dynamic> user) {
+    setState(() {
+      users.removeWhere((u) => u['id'] == user['id']);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('User berhasil dihapus')),
+    );
   }
 
-  // === UI ===
+  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -207,7 +152,7 @@ class _UserCrudPageState extends State<UserCrudPage> {
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => deleteUser(user['id']),
+                          onPressed: () => deleteUser(user),
                         ),
                       ],
                     ),

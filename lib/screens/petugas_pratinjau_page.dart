@@ -37,7 +37,6 @@ class PetugasPratinjauPage extends StatelessWidget {
                     )
                   ],
                 ),
-
                 const Divider(height: 24),
 
                 // ALAT & KATEGORI
