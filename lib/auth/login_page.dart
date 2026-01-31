@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
       } else if (role == 'petugas') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const PetugasBerandaPage()),
+          MaterialPageRoute(builder: (_) => const PetugasDashboard()),
         );
       } else if (role == 'peminjam') {
         Navigator.pushReplacement(

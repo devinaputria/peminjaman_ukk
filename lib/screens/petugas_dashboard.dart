@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'petugas_beranda_page.dart';
-import 'petugas_pratinjau_page.dart';
-import 'petugas_laporan_page.dart';
 
 class PetugasDashboard extends StatefulWidget {
   const PetugasDashboard({super.key});
@@ -14,33 +11,13 @@ class _PetugasDashboardState extends State<PetugasDashboard> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const PetugasBerandaPage(),
-    const PetugasPratinjauPage(),
-    const PetugasLaporanPage(),
+    const Center(child: Text('Ini Halaman Beranda', style: TextStyle(fontSize: 24))),
+    const Center(child: Text('Ini Halaman Pratinjau', style: TextStyle(fontSize: 24))),
+    const Center(child: Text('Ini Halaman Laporan', style: TextStyle(fontSize: 24))),
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_getTitle()),
-        centerTitle: true,
-      ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Pratinjau'),
-          BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Laporan'),
-        ],
-      ),
-    );
+  void _onNavTap(int index) {
+    setState(() => _currentIndex = index);
   }
 
   String _getTitle() {
@@ -54,5 +31,25 @@ class _PetugasDashboardState extends State<PetugasDashboard> {
       default:
         return '';
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_getTitle()),
+        centerTitle: true,
+      ),
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onNavTap,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Pratinjau'),
+          BottomNavigationBarItem(icon: Icon(Icons.report), label: 'Laporan'),
+        ],
+      ),
+    );
   }
 }

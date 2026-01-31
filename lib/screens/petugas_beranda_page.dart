@@ -1,81 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-class PetugasBerandaPage extends StatefulWidget {
+class PetugasBerandaPage extends StatelessWidget {
   const PetugasBerandaPage({super.key});
 
-@override
-Widget build(BuildContext context) {
-  print("PetugasBerandaPage dibangun!");
-  return Scaffold(
-    appBar: AppBar(title: Text('Beranda Petugas')),
-    body: Center(child: Text('Isi Beranda')),
-  );
-}
-
-
-  @override
-  State<PetugasBerandaPage> createState() => _PetugasBerandaPageState();
-}
-
-class _PetugasBerandaPageState extends State<PetugasBerandaPage> {
-  final supabase = Supabase.instance.client;
-
-  List dataPeminjaman = [];
-  bool loading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchPeminjaman();
-  }
-
-  // ================= AMBIL DATA =================
-  Future<void> fetchPeminjaman() async {
-    final result = await supabase
-        .from('peminjaman')
-        .select()
-        .eq('status', 'menunggu')
-        .order('id');
-
-    setState(() {
-      dataPeminjaman = result;
-      loading = false;
-    });
-  }
-
-  // ================= SETUJU =================
-  Future<void> setujui(String id) async {
-    await supabase
-        .from('peminjaman')
-        .update({'status': 'disetujui'})
-        .eq('id', id);
-
-    fetchPeminjaman();
-  }
-
-  // ================= TOLAK =================
-  Future<void> tolak(String id) async {
-    await supabase
-        .from('peminjaman')
-        .update({'status': 'ditolak'})
-        .eq('id', id);
-
-    fetchPeminjaman();
-  }
+  // Dummy data peminjaman
+  final List<Map<String, String>> dataPeminjaman = const [
+    {
+      'nama': 'Andi',
+      'kelas': 'XII RPL 1',
+      'alat': 'Mesin Bor',
+      'kategori': 'Mesin',
+      'status': 'menunggu'
+    },
+    {
+      'nama': 'Budi',
+      'kelas': 'XII RPL 2',
+      'alat': 'Mesin Bubut',
+      'kategori': 'Mesin',
+      'status': 'disetujui'
+    },
+    {
+      'nama': 'Cici',
+      'kelas': 'XII RPL 3',
+      'alat': 'Sarung Tangan',
+      'kategori': 'Safety',
+      'status': 'ditolak'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (dataPeminjaman.isEmpty) {
-      return const Center(
-        child: Text('Tidak ada pengajuan peminjaman'),
-      );
-    }
-
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: dataPeminjaman.length,
@@ -83,18 +37,17 @@ class _PetugasBerandaPageState extends State<PetugasBerandaPage> {
         final item = dataPeminjaman[index];
 
         return Card(
-          elevation: 4,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           margin: const EdgeInsets.only(bottom: 16),
+          elevation: 4,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                // ================= PEMINJAM =================
+                // Nama + Kelas
                 Row(
                   children: [
                     const CircleAvatar(
@@ -106,84 +59,45 @@ class _PetugasBerandaPageState extends State<PetugasBerandaPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item['nama_peminjam'],
+                          item['nama']!,
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                              fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         Text(
-                          item['kelas'],
+                          item['kelas']!,
                           style: const TextStyle(color: Colors.grey),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
                 const Divider(),
-
-                // ================= INFO ALAT =================
+                // Alat & Kategori
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    infoChip(
-                      icon: Icons.build,
-                      label: item['alat'],
-                    ),
-                    infoChip(
-                      icon: Icons.category,
-                      label: item['kategori'],
-                    ),
+                    Chip(
+                        avatar: const Icon(Icons.build, size: 18),
+                        label: Text(item['alat']!),
+                        backgroundColor: Colors.blue.shade50),
+                    Chip(
+                        avatar: const Icon(Icons.category, size: 18),
+                        label: Text(item['kategori']!),
+                        backgroundColor: Colors.blue.shade50),
                   ],
                 ),
-
                 const SizedBox(height: 16),
-
-                // ================= AKSI =================
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () => tolak(item['id']),
-                        icon: const Icon(Icons.close),
-                        label: const Text('Tolak'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.red),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () => setujui(item['id']),
-                        icon: const Icon(Icons.check),
-                        label: const Text('Setuju'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ],
-                )
+                // Status
+                Text(
+                  'Status: ${item['status']!.toUpperCase()}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-  
-    // ================= CHIP =================
-    Widget infoChip({required IconData icon, required String label}) {
-    return Chip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-      backgroundColor: Colors.blue.shade50,
     );
   }
 }
