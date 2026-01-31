@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (_) => const PeminjamBerandaPage()),
         );
       } else {
-        throw 'Role tidak dikenali';
+        throw 'Role tidak diketahui';
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,13 +81,13 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff1e40af), // 🔵 biru polos
+      backgroundColor: const Color(0xff1e40af), 
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
             children: [
-              // LOGO TANPA ASSET
+              // LOGO 
               const Icon(
                 Icons.construction,
                 size: 110,
@@ -172,9 +172,9 @@ class _LoginPageState extends State<LoginPage> {
                       height: 48,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xff1e40af),
+                          backgroundColor: const Color.fromARGB(255, 194, 195, 199),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(15),
                           ),
                         ),
                         onPressed: loading ? null : login,

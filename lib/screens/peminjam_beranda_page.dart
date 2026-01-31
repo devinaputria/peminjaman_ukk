@@ -21,7 +21,6 @@ class PeminjamBerandaPage extends StatelessWidget {
             style: TextStyle(color: Colors.grey),
           ),
           const SizedBox(height: 20),
-
           Container(
             height: 140,
             decoration: BoxDecoration(
@@ -31,17 +30,11 @@ class PeminjamBerandaPage extends StatelessWidget {
             child: const Center(
               child: Text(
                 'Sistem Peminjaman Alat',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-
           const SizedBox(height: 30),
-
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,

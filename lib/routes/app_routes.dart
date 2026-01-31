@@ -1,36 +1,46 @@
-import 'package:flutter/material.dart';
-import '../auth/login_page.dart';
+import 'package:flutter/widgets.dart';
+import 'package:peminjaman/screens/admin_page.dart';
+import 'package:peminjaman/screens/detail_peminjaman_page.dart';
+
+import '../screens/peminjam_beranda_page.dart';
+import '../screens/peminjam_alat_page.dart';
+import '../screens/peminjam_peminjaman_page.dart';
+import '../screens/peminjam_riwayat_page.dart';
+import '../screens/peminjam_profil_page.dart';
 import '../screens/admin_dashboard.dart';
-import 'package:peminjaman/screens/peminjam_dashboard.dart' as peminjam;
-import 'package:peminjaman/screens/petugas_dashboard.dart' as petugas;
-import 'package:peminjaman/screens/alat_crud_page.dart';
-import 'package:peminjaman/screens/peminjam_alat_page.dart';
-import 'package:peminjaman/screens/peminjam_beranda_page.dart';
-import 'package:peminjaman/screens/peminjam_riwayat_page.dart';
-import 'package:peminjaman/screens/peminjam_detail_profil_page.dart';
-import 'package:peminjaman/screens/peminjam_peminjaman_page.dart';
+import '../screens/admin_edit_page.dart';
+import '../screens/transaksi.dart';
+import '../screens/riwayat_page.dart';
+import '../auth/login_page.dart';
 
 class AppRoutes {
-  static const login = '/';
-  static const admin = '/admin';
-  static const petugasRoute = '/petugas';
-  static const peminjamRoute = '/peminjam';
+  // Halaman Peminjam
+  static const String beranda = '/peminjam-beranda';
+  static const String alat = '/peminjam-alat';
+  static const String peminjaman = '/peminjam-peminjaman';
+  static const String riwayat = '/peminjam-riwayat';
+  static const String profilDetail = '/peminjam-profil';
 
-  static const alat = '/alat';
-  static const profilDetail = '/profil-detail';
-  static const riwayat = '/riwayat';
-  static const peminjaman = '/peminjaman';
+  // Halaman Admin
+  static const String adminDashboard = '/admin-dashboard';
+  static const String edit = '/admin-edit';
+  static const String transaksi = '/admin-transaksi';
+  static const String riwayatAdmin = '/admin-riwayat';
 
-  static Map<String, WidgetBuilder> routes = {
-    login: (_) => const LoginPage(),
-    admin: (_) => const AdminDashboard(),
-    petugasRoute: (_) => const petugas.PetugasDashboard(),
-    peminjamRoute: (_) => const peminjam.PeminjamDashboardPage(), // <- fix
+  // Login
+  static const String login = '/login';
 
-    // Halaman peminjam
-   alat: (_) => const AlatPage(),                      // halaman alat
-    profilDetail: (_) => const PeminjamProfilDetailPage(),
-    riwayat: (_) => const PeminjamRiwayatPage(),
-    peminjaman: (_) => const PeminjamanPage() // halaman peminjaman
-  };
+  // Map routes untuk MaterialApp
+  static Map<String, Widget Function(BuildContext)> get routes => {
+        beranda: (_) => const PeminjamBerandaPage(),
+        alat: (_) => const AlatPage(),
+        peminjaman: (_) => const DetailPeminjamanPage(),
+        riwayat: (_) => const RiwayatPage(),
+        profilDetail: (_) => const PeminjamProfilPage(),
+        adminDashboard: (_) => const AdminDashboard(),
+        edit: (_) => const AdminPage(),
+        transaksi: (_) => const TransaksiPage(),
+        riwayatAdmin: (_) => const RiwayatPage(),
+        login: (_) => const LoginPage(),
+      };
 }

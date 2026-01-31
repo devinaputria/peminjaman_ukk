@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AlatCrudPage extends StatefulWidget {
   const AlatCrudPage({super.key});
@@ -8,13 +9,37 @@ class AlatCrudPage extends StatefulWidget {
 }
 
 class _AlatCrudPageState extends State<AlatCrudPage> {
-  final List<Map<String, String>> alatList = [
-    {'nama': 'Mesin Bor', 'kategori': 'Mesin'},
-    {'nama': 'Sarung Tangan', 'kategori': 'K3'},
-  ];
+  final supabase = Supabase.instance.client;
 
-  // ===== TAMBAH / EDIT =====
-  void _tambahEditAlat({Map<String, String>? alat, int? index}) {
+  List<Map<String, dynamic>> alatList = [];
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAlat();
+  }
+
+  // ================= GET =================
+  Future<void> fetchAlat() async {
+    setState(() => loading = true);
+    try {
+      final data = await supabase.from('alat').select().order('id', ascending: true);
+      setState(() {
+        alatList = List<Map<String, dynamic>>.from(data);
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+      print('Error fetch alat: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal mengambil data alat')),
+      );
+    }
+  }
+
+  // ================= TAMBAH / EDIT =================
+  void _tambahEditAlat({Map<String, dynamic>? alat}) {
     final namaController = TextEditingController(text: alat?['nama']);
     final kategoriController = TextEditingController(text: alat?['kategori']);
 
@@ -42,21 +67,34 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
             child: const Text('Batal'),
           ),
           ElevatedButton(
-            onPressed: () {
-              setState(() {
+            onPressed: () async {
+              try {
                 if (alat == null) {
-                  alatList.add({
+                  await supabase.from('alat').insert({
                     'nama': namaController.text,
                     'kategori': kategoriController.text,
                   });
                 } else {
-                  alatList[index!] = {
+                  await supabase.from('alat').update({
                     'nama': namaController.text,
                     'kategori': kategoriController.text,
-                  };
+                  }).eq('id', alat['id']);
                 }
-              });
-              Navigator.pop(context);
+                Navigator.pop(context);
+                fetchAlat();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(alat == null
+                        ? 'Alat berhasil ditambah'
+                        : 'Alat berhasil diupdate'),
+                  ),
+                );
+              } catch (e) {
+                print('Error simpan alat: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Gagal menyimpan alat')),
+                );
+              }
             },
             child: const Text('Simpan'),
           ),
@@ -65,13 +103,23 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
     );
   }
 
-  // ===== HAPUS =====
-  void _hapusAlat(int index) {
-    setState(() {
-      alatList.removeAt(index);
-    });
+  // ================= HAPUS =================
+  void _hapusAlat(dynamic id) async {
+    try {
+      await supabase.from('alat').delete().eq('id', id);
+      fetchAlat();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Alat berhasil dihapus')),
+      );
+    } catch (e) {
+      print('Error hapus alat: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menghapus alat')),
+      );
+    }
   }
 
+  // ================= UI =================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,41 +171,42 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
 
           // ===== LIST ALAT =====
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: alatList.length,
-              itemBuilder: (_, i) {
-                final alat = alatList[i];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: Color(0xFF2E5B9F),
-                      child: Icon(Icons.build, color: Colors.white),
-                    ),
-                    title: Text(alat['nama']!),
-                    subtitle: Text('Kategori: ${alat['kategori']}'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.orange),
-                          onPressed: () =>
-                              _tambahEditAlat(alat: alat, index: i),
+            child: loading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: alatList.length,
+                    itemBuilder: (_, i) {
+                      final alat = alatList[i];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _hapusAlat(i),
+                        child: ListTile(
+                          leading: const CircleAvatar(
+                            backgroundColor: Color(0xFF2E5B9F),
+                            child: Icon(Icons.build, color: Colors.white),
+                          ),
+                          title: Text(alat['nama'] ?? ''),
+                          subtitle: Text('Kategori: ${alat['kategori'] ?? ''}'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.edit, color: Colors.orange),
+                                onPressed: () => _tambahEditAlat(alat: alat),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                onPressed: () => _hapusAlat(alat['id']),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
           ),
         ],
       ),

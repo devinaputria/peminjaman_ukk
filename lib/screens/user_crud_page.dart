@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../services/supabase_service.dart';
 
 class UserCrudPage extends StatefulWidget {
   const UserCrudPage({super.key});
@@ -27,11 +26,20 @@ class _UserCrudPageState extends State<UserCrudPage> {
 
   // ================= GET =================
   Future<void> fetchUsers() async {
-    final data = await supabase.from('users').select();
-    setState(() {
-      users = data;
-      loading = false;
-    });
+    setState(() => loading = true);
+    try {
+      final data = await supabase.from('users').select();
+      setState(() {
+        users = data;
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+      print('Error fetch users: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal mengambil data users')),
+      );
+    }
   }
 
   // ================= INSERT & UPDATE =================
@@ -46,39 +54,77 @@ class _UserCrudPageState extends State<UserCrudPage> {
       roleController.clear();
     }
 
+    final _formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: Text(user == null ? 'Tambah User' : 'Edit User'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: namaController, decoration: const InputDecoration(labelText: 'Nama')),
-            TextField(controller: usernameController, decoration: const InputDecoration(labelText: 'Username')),
-            TextField(controller: roleController, decoration: const InputDecoration(labelText: 'Role')),
-          ],
+        content: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: namaController,
+                decoration: const InputDecoration(labelText: 'Nama'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Nama tidak boleh kosong' : null,
+              ),
+              TextFormField(
+                controller: usernameController,
+                decoration: const InputDecoration(labelText: 'Username'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Username tidak boleh kosong' : null,
+              ),
+              TextFormField(
+                controller: roleController,
+                decoration: const InputDecoration(labelText: 'Role'),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Role tidak boleh kosong' : null,
+              ),
+            ],
+          ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal')),
           ElevatedButton(
             child: const Text('Simpan'),
             onPressed: () async {
-              if (user == null) {
-                await supabase.from('users').insert({
-                  'nama': namaController.text,
-                  'username': usernameController.text,
-                  'role': roleController.text,
-                });
-              } else {
-                await supabase.from('users').update({
-                  'nama': namaController.text,
-                  'username': usernameController.text,
-                  'role': roleController.text,
-                }).eq('id', user['id']);
-              }
+              if (_formKey.currentState!.validate()) {
+                try {
+                  if (user == null) {
+                    await supabase.from('users').insert({
+                      'nama': namaController.text,
+                      'username': usernameController.text,
+                      'role': roleController.text,
+                    });
+                  } else {
+                    await supabase.from('users').update({
+                      'nama': namaController.text,
+                      'username': usernameController.text,
+                      'role': roleController.text,
+                    }).eq('id', user['id']);
+                  }
 
-              Navigator.pop(context);
-              fetchUsers();
+                  Navigator.pop(context);
+                  fetchUsers();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(user == null
+                          ? 'User berhasil ditambah'
+                          : 'User berhasil diupdate'),
+                    ),
+                  );
+                } catch (e) {
+                  print('Error simpan user: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Gagal menyimpan user')),
+                  );
+                }
+              }
             },
           ),
         ],
@@ -86,13 +132,23 @@ class _UserCrudPageState extends State<UserCrudPage> {
     );
   }
 
-  // ================= DELETE =================
-  Future<void> deleteUser(String id) async {
-    await supabase.from('users').delete().eq('id', id);
-    fetchUsers();
+  // === DELETE ===
+  Future<void> deleteUser(dynamic id) async {
+    try {
+      await supabase.from('users').delete().eq('id', id);
+      fetchUsers();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User berhasil dihapus')),
+      );
+    } catch (e) {
+      print('Error delete user: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal menghapus user')),
+      );
+    }
   }
 
-  // ================= UI =================
+  // === UI ===
   @override
   Widget build(BuildContext context) {
     return Scaffold(
