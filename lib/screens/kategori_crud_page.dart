@@ -168,7 +168,6 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
 
       body: loading
           ? const Center(child: CircularProgressIndicator())
-
           : kategoriList.isEmpty
               ? const Center(
                   child: Text(
@@ -225,10 +224,10 @@ class _KategoriCrudPageState extends State<KategoriCrudPage> {
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

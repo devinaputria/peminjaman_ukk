@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color background = Color(0xFFFFF8E1); // cream
+  static const Color background = Color.fromARGB(255, 248, 247, 242); // cream
   static const Color primary = Color(0xFF2A5191);    // biru
   static const Color onPrimary = Colors.white;       // teks & icon di atas biru
 }
@@ -38,7 +38,7 @@ class AdminPage extends StatelessWidget {
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'Kelola data utama aplikasi',
+                  'Kelola data utama ',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
@@ -60,7 +60,6 @@ class AdminPage extends StatelessWidget {
                   DashboardCard(title: 'User', icon: Icons.people),
                   DashboardCard(title: 'Kategori', icon: Icons.category),
                   DashboardCard(title: 'Alat', icon: Icons.build),
-                  DashboardCard(title: 'Peminjaman', icon: Icons.assignment),
                 ],
               ),
             ),

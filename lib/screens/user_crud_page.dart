@@ -212,12 +212,25 @@ class _UserCrudPageState extends State<UserCrudPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manajemen User'),
+      // ================= APPBAR MODERN =================
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100), // tinggi AppBar
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A5191),
+          elevation: 4,
+          centerTitle: true,
+          title: const Text(
+            'Manajemen User',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
+
+      backgroundColor: const Color(0xFFF5F5F5), // ganti background
 
       floatingActionButton: FloatingActionButton(
         onPressed: () => showForm(),
+        backgroundColor: const Color(0xFF2A5191),
         child: const Icon(Icons.add),
       ),
 
@@ -229,9 +242,30 @@ class _UserCrudPageState extends State<UserCrudPage> {
               itemBuilder: (_, i) {
                 final user = users[i];
 
+                // CARD MODERN
                 return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 3,
+                  margin: const EdgeInsets.only(bottom: 12),
                   child: ListTile(
-                    title: Text(user['nama'] ?? ''),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    leading: CircleAvatar(
+                      backgroundColor: const Color(0xFF2A5191),
+                      child: Text(
+                        user['nama'] != null && user['nama'].isNotEmpty
+                            ? user['nama'][0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    title: Text(
+                      user['nama'] ?? '',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 16),
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -239,7 +273,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
                         Text('Role: ${user['role']}'),
                       ],
                     ),
-
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -247,7 +280,6 @@ class _UserCrudPageState extends State<UserCrudPage> {
                           icon: const Icon(Icons.edit, color: Colors.orange),
                           onPressed: () => showForm(user: user),
                         ),
-
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () => deleteUser(user['id']),
