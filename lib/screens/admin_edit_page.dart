@@ -33,23 +33,11 @@ class EditMenuScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF2A5191), // tetap biru
+        backgroundColor: const Color(0xFF2A5191),
         elevation: 4,
-        automaticallyImplyLeading: false, // hentikan back button otomatis
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // tombol kembali manual
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              // TODO: Tambahkan aksi logout
-            },
-          ),
-        ],
+        // ✅ Logout dihapus, jadi hanya AppBar biasa
       ),
-      backgroundColor: const Color.fromARGB(255, 248, 247, 242), // cream
+      backgroundColor: const Color.fromARGB(255, 248, 247, 242),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -60,7 +48,6 @@ class EditMenuScreen extends StatelessWidget {
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 20),
-
             // ===== GRID MENU =====
             Expanded(
               child: GridView.builder(
