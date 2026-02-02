@@ -12,15 +12,27 @@ class PeminjamBerandaPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 40),
+
+          // Salam
           const Text(
             'Halo, Peminjam 👋',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xff01386C), // ganti warna sesuai keinginan
+            ),
           ),
+          const SizedBox(height: 4),
           const Text(
             'Mau pinjam alat apa hari ini?',
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(
+              color: Color(0xff01386C), // warna untuk subjudul
+              fontSize: 16,
+            ),
           ),
           const SizedBox(height: 20),
+
+          // Banner
           Container(
             height: 140,
             decoration: BoxDecoration(
@@ -30,15 +42,23 @@ class PeminjamBerandaPage extends StatelessWidget {
             child: const Center(
               child: Text(
                 'Sistem Peminjaman Alat',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: Colors.white, 
+                  fontSize: 18, 
+                  fontWeight: FontWeight.bold
+                ),
               ),
             ),
           ),
           const SizedBox(height: 30),
+
+          // Grid menu
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
               childAspectRatio: 1.2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
               children: [
                 menuItem(context, Icons.build, 'Alat', AppRoutes.alat),
                 menuItem(context, Icons.shopping_cart, 'Peminjaman', AppRoutes.peminjaman),
@@ -67,7 +87,10 @@ class PeminjamBerandaPage extends StatelessWidget {
               child: Icon(icon, color: Colors.blue, size: 28),
             ),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              label, 
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),

@@ -1,154 +1,113 @@
 import 'package:flutter/material.dart';
 
-class AlatPage extends StatelessWidget {
+class AlatPage extends StatefulWidget {
   const AlatPage({super.key});
 
-  //data alat
+  @override
+  State<AlatPage> createState() => _AlatPageState();
+}
+
+class _AlatPageState extends State<AlatPage> {
+  // Data alat
   final List<Map<String, dynamic>> alatList = const [
-    {
-      "id": 1,
-      "nama_mesin": "Mesin Bor",
-      "kategori_id": 1,
-      "denda": 5000,
-      "stok": 1,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 12:42:20",
-    },
-    {
-      "id": 2,
-      "nama_mesin": "Mesin Bubut",
-      "kategori_id": 1,
-      "denda": 50000,
-      "stok": 2,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 3,
-      "nama_mesin": "Mesin Frais",
-      "kategori_id": 1,
-      "denda": 60000,
-      "stok": 1,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 4,
-      "nama_mesin": "Mesin Bor Duduk",
-      "kategori_id": 1,
-      "denda": 40000,
-      "stok": 3,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 5,
-      "nama_mesin": "Jangka Sorong",
-      "kategori_id": 2,
-      "denda": 15000,
-      "stok": 5,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 6,
-      "nama_mesin": "Mikrometer Luar",
-      "kategori_id": 2,
-      "denda": 20000,
-      "stok": 4,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 7,
-      "nama_mesin": "Kacamata Safety",
-      "kategori_id": 3,
-      "denda": 5000,
-      "stok": 10,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 8,
-      "nama_mesin": "Sarung Tangan",
-      "kategori_id": 3,
-      "denda": 3000,
-      "stok": 20,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
-    {
-      "id": 9,
-      "nama_mesin": "Sepatu Safety",
-      "kategori_id": 3,
-      "denda": 10000,
-      "stok": 8,
-      "kondisi": "Baik",
-      "created_at": "2026-01-14 06:03:40",
-    },
+    {"id": 1, "nama_mesin": "Mesin Bor", "kategori": "Mesin",},
+    {"id": 2, "nama_mesin": "Mesin Bubut", "kategori": "Mesin",},
+    {"id": 3, "nama_mesin": "Mesin Frais", "kategori": "Mesin",},
+    {"id": 4, "nama_mesin": "Mesin Bor Duduk", "kategori": "Mesin",},
+    {"id": 5, "nama_mesin": "Jangka Sorong", "kategori": "Alat Ukur",},
+    {"id": 6, "nama_mesin": "Mikrometer Luar", "kategori": "Alat Ukur",},
+    {"id": 7, "nama_mesin": "Kacamata Safety", "kategori": "Safety",},
+    {"id": 8, "nama_mesin": "Sarung Tangan", "kategori": "Safety",},
+    {"id": 9, "nama_mesin": "Sepatu Safety", "kategori": "Safety",},
   ];
+
+  // Untuk menyimpan kategori yang dipilih
+  String selectedKategori = "Semua";
 
   @override
   Widget build(BuildContext context) {
+    // Ambil daftar kategori unik
+    final categories = ["Semua", ...{for (var alat in alatList) alat['kategori']}];
+
+    // Filter alat berdasarkan kategori yang dipilih
+    final filteredAlat = selectedKategori == "Semua"
+        ? alatList
+        : alatList.where((alat) => alat['kategori'] == selectedKategori).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Alat'),
-        backgroundColor: Colors.blueAccent,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // kembali ke halaman sebelumnya
-          },
-        ),
+        backgroundColor: const Color(0xff01386C),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: alatList.length,
-        itemBuilder: (context, index) {
-          final alat = alatList[index];
-          return Card(
-            elevation: 3,
-            margin: const EdgeInsets.symmetric(vertical: 6),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    alat["nama_mesin"],
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+      body: Column(
+        children: [
+          // Filter kategori
+          Container(
+            padding: const EdgeInsets.all(12),
+            height: 60,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                final isSelected = category == selectedKategori;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: ChoiceChip(
+                    label: Text(category),
+                    selected: isSelected,
+                    selectedColor: const Color(0xff01386C),
+                    labelStyle: TextStyle(
+                      color: isSelected ? Colors.white : Colors.black,
+                    ),
+                    onSelected: (_) {
+                      setState(() {
+                        selectedKategori = category;
+                      });
+                    },
                   ),
-                  const SizedBox(height: 6),
-                  Text("ID: ${alat["id"]}"),
-                  Text("Kategori ID: ${alat["kategori_id"]}"),
-                  Text("Denda: Rp${alat["denda"]}"),
-                  Text("Stok: ${alat["stok"]}"),
-                  Text("Kondisi: ${alat["kondisi"]}"),
-                  Text("Ditambahkan: ${alat["created_at"]}"),
-                  const SizedBox(height: 8),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton.icon(
+                );
+              },
+            ),
+          ),
+
+          // List alat
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: filteredAlat.length,
+              itemBuilder: (context, index) {
+                final alat = filteredAlat[index];
+                return Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                  child: ListTile(
+                    title: Text(
+                      alat['nama_mesin'],
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text("Kategori: ${alat['kategori']}"),
+                    trailing: ElevatedButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                              content: Text('Pinjam ${alat["nama_mesin"]}')),
+                            content: Text("Pinjam ${alat['nama_mesin']}"),
+                          ),
                         );
                       },
-                      icon: const Icon(Icons.add_shopping_cart),
-                      label: const Text('Pinjam'),
                       style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent),
+                        backgroundColor: const Color(0xff01386C),
+                      ),
+                      child: const Text("Pinjam"),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }

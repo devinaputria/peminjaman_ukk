@@ -7,7 +7,21 @@ class TransaksiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E7), // cream background
+       // ================= APPBAR MODERN =================
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(100), // tinggi AppBar
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A5191),
+          elevation: 4,
+          centerTitle: true,
+          title: const Text(
+            'Manajemen User',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
+
+      backgroundColor: const Color.fromARGB(255, 248, 247, 242), // cream background
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

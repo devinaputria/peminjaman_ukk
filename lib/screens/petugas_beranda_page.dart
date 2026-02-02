@@ -1,97 +1,92 @@
+//petugas_beranda
 import 'package:flutter/material.dart';
 
 class PetugasBerandaPage extends StatelessWidget {
   const PetugasBerandaPage({super.key});
 
-  // Dummy data peminjaman
-  final List<Map<String, String>> dataPeminjaman = const [
+  final List<Map<String, String>> dataDummy = const [
     {
       'nama': 'Andi',
-      'kelas': 'XII RPL 1',
-      'alat': 'Mesin Bor',
-      'kategori': 'Mesin',
-      'status': 'menunggu'
+      'kelas': 'XI RPL 1',
+      'alat': 'Bor Listrik',
+      'kategori': 'Perkakas',
+      'status': 'menunggu',
     },
     {
-      'nama': 'Budi',
-      'kelas': 'XII RPL 2',
-      'alat': 'Mesin Bubut',
-      'kategori': 'Mesin',
-      'status': 'disetujui'
+      'nama': 'Siti',
+      'kelas': 'XI RPL 2',
+      'alat': 'Gergaji',
+      'kategori': 'Perkakas',
+      'status': 'disetujui',
     },
     {
-      'nama': 'Cici',
-      'kelas': 'XII RPL 3',
-      'alat': 'Sarung Tangan',
-      'kategori': 'Safety',
-      'status': 'ditolak'
+      'nama': 'Rani',
+      'kelas': 'XI RPL 3',
+      'alat': 'Helm Safety',
+      'kategori': 'Keamanan',
+      'status': 'ditolak',
     },
   ];
+
+  Color getWarnaStatus(String status) {
+    switch (status) {
+      case 'menunggu':
+        return Colors.orange;
+      case 'disetujui':
+        return Colors.green;
+      case 'ditolak':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: dataPeminjaman.length,
+      itemCount: dataDummy.length,
       itemBuilder: (context, index) {
-        final item = dataPeminjaman[index];
+        final item = dataDummy[index];
 
         return Card(
+          margin: const EdgeInsets.only(bottom: 12),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
-          margin: const EdgeInsets.only(bottom: 16),
-          elevation: 4,
+          elevation: 3,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Nama + Kelas
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      backgroundColor: Colors.blue,
-                      child: Icon(Icons.person, color: Colors.white),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item['nama']!,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 16),
-                        ),
-                        Text(
-                          item['kelas']!,
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const Divider(),
-                // Alat & Kategori
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Chip(
-                        avatar: const Icon(Icons.build, size: 18),
-                        label: Text(item['alat']!),
-                        backgroundColor: Colors.blue.shade50),
-                    Chip(
-                        avatar: const Icon(Icons.category, size: 18),
-                        label: Text(item['kategori']!),
-                        backgroundColor: Colors.blue.shade50),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Status
                 Text(
-                  'Status: ${item['status']!.toUpperCase()}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  item['nama']!,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                Text("Kelas: ${item['kelas']}"),
+                Text("Alat: ${item['alat']}"),
+                Text("Kategori: ${item['kategori']}"),
+
+                const SizedBox(height: 8),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: getWarnaStatus(item['status']!),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    item['status']!.toUpperCase(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
