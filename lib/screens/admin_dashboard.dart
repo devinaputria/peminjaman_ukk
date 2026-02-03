@@ -56,7 +56,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
 
       // ✅ Background cream untuk seluruh dashboard
-      backgroundColor: const Color(0xFFFFF8E7),
+      backgroundColor: Color.fromARGB(255, 248, 247, 242),
 
       body: IndexedStack(
         index: _currentIndex,

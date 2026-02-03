@@ -1,28 +1,26 @@
 import 'package:flutter/widgets.dart';
+import 'package:peminjaman/screens/admin_peminjaman.dart';
 import 'package:peminjaman/screens/detail_peminjaman_page.dart';
-
 // ===== PEMINJAM =====
 import '../screens/peminjam_beranda_page.dart';
 import '../screens/peminjam_alat_page.dart';
 import '../screens/peminjam_peminjaman_page.dart';
 import '../screens/peminjam_riwayat_page.dart';
 import '../screens/peminjam_profil_page.dart';
-
 // ===== ADMIN =====
 import '../screens/admin_dashboard.dart';
 import '../screens/admin_page.dart';
 import '../screens/admin_edit_page.dart';
 import '../screens/transaksi.dart';
 import '../screens/riwayat_page.dart';
-
 // ===== PETUGAS =====
 import '../screens/petugas_dashboard.dart';
 import '../screens/petugas_beranda_page.dart';
 import '../screens/petugas_pratinjau_page.dart';
 import '../screens/petugas_laporan_page.dart';
-
 // ===== AUTH =====
 import '../auth/login_page.dart';
+
 
 class AppRoutes {
   // ===== PEMINJAM =====
@@ -69,6 +67,6 @@ class AppRoutes {
         petugasLaporan: (_) => const PetugasLaporanPage(),
 
         // AUTH
-        login: (_) => const LoginPage(),
+          login: (_) => const LoginPage(),
       };
 }

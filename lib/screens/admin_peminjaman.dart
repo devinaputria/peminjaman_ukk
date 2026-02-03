@@ -7,6 +7,9 @@ class PeminjamanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ============ INI YANG KAMU MINTA =============
+      backgroundColor: const Color.fromARGB(255, 248, 247, 242),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -20,7 +23,7 @@ class PeminjamanPage extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        // 👉 PINDAH KE DETAIL
+        // 👉 PINDAH KE DETAIL (TETAP SAMA – TIDAK DIUBAH)
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -28,20 +31,25 @@ class PeminjamanPage extends StatelessWidget {
           ),
         );
       },
+
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
         elevation: 2,
+
         child: Padding(
           padding: const EdgeInsets.all(16),
+
           child: Row(
             children: [
               const CircleAvatar(
                 radius: 24,
                 child: Icon(Icons.person),
               ),
+
               const SizedBox(width: 16),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +61,9 @@ class PeminjamanPage extends StatelessWidget {
                         fontSize: 16,
                       ),
                     ),
+
                     SizedBox(height: 4),
+
                     Text(
                       'XI TPM 1',
                       style: TextStyle(color: Colors.grey),
@@ -61,6 +71,7 @@ class PeminjamanPage extends StatelessWidget {
                   ],
                 ),
               ),
+
               Column(
                 children: const [
                   Text(
@@ -70,7 +81,9 @@ class PeminjamanPage extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+
                   SizedBox(height: 6),
+
                   Icon(Icons.chevron_right),
                 ],
               ),
