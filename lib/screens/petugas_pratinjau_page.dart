@@ -1,4 +1,3 @@
-//pratinjau petugas
 import 'package:flutter/material.dart';
 
 class PetugasPratinjauPage extends StatelessWidget {
@@ -29,6 +28,8 @@ class PetugasPratinjauPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                // Nama Barang
                 Text(
                   item['barang']!,
                   style: const TextStyle(
@@ -39,10 +40,12 @@ class PetugasPratinjauPage extends StatelessWidget {
 
                 const SizedBox(height: 6),
 
+                // Dipinjam oleh
                 Text("Dipinjam oleh: ${item['oleh']}"),
 
                 const SizedBox(height: 6),
 
+                // Status
                 Text(
                   "Status: ${item['status']}",
                   style: TextStyle(
@@ -55,10 +58,13 @@ class PetugasPratinjauPage extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
+                // Tombol hanya muncul kalau status = Pengembalian
                 if (item['status'] == "Pengembalian")
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+
+                      // Tombol Konfirmasi
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -75,6 +81,7 @@ class PetugasPratinjauPage extends StatelessWidget {
 
                       const SizedBox(width: 8),
 
+                      // Tombol Tolak
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,

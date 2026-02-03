@@ -33,23 +33,26 @@ class EditMenuScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF2A5191), // tetap biru
-        elevation: 4,
-        automaticallyImplyLeading: false, // hentikan back button otomatis
+        backgroundColor: const Color(0xFF2A5191),
+
+        // tombol kembali
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // tombol kembali manual
+          onPressed: () => Navigator.pop(context),
         ),
+
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // TODO: Tambahkan aksi logout
+              // TODO: fungsi logout nanti
             },
           ),
         ],
       ),
-      backgroundColor: const Color.fromARGB(255, 248, 247, 242), // cream
+
+      backgroundColor: const Color.fromARGB(255, 248, 247, 242),
+
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
