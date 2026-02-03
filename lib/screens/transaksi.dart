@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'admin_pengembalian.dart';
+import 'admin_peminjaman.dart';      // halaman daftar peminjaman
+import 'admin_pengembalian.dart';    // halaman daftar pengembalian
 
 class TransaksiPage extends StatelessWidget {
   const TransaksiPage({super.key});
@@ -71,7 +72,7 @@ class TransaksiPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const AdminPengembalianPage(),
+                    builder: (_) => const AdminPeminjamanPage(), // <-- PERBAIKAN DI SINI
                   ),
                 );
               },

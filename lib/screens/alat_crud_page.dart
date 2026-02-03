@@ -47,12 +47,14 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
     final namaController = TextEditingController(text: alat?['nama_mesin'] ?? '');
     final dendaController = TextEditingController(text: alat?['denda']?.toString() ?? '0');
     final stokController = TextEditingController(text: alat?['stok']?.toString() ?? '0');
+
     int? selectedKategori = alat?['kategori_id'];
-    String? gambarUrl = alat?['gambar'];
-    Uint8List? webImage;
-    String? fileName;
     String selectedKondisi = alat?['kondisi'] ?? 'Baik';
     const kondisiOptions = ['Baik', 'Rusak Ringan', 'Rusak Berat'];
+
+    Uint8List? webImage;
+    String? fileName;
+    String? gambarUrl = alat?['gambar'];
 
     showDialog(
       context: context,
@@ -65,9 +67,7 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0, 5)),
-                ],
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 15, offset: Offset(0, 5))],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -83,6 +83,8 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                       children: [
                         _decoratedTextField(namaController, 'Nama Mesin', Icons.settings),
                         const SizedBox(height: 12),
+
+                        // Dropdown Kategori
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
@@ -90,7 +92,7 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: DropdownButtonFormField<int>(
-                            value: selectedKategori,
+                            value: kategoriList.any((k) => k['id'] == selectedKategori) ? selectedKategori : null,
                             decoration: const InputDecoration(border: InputBorder.none, labelText: 'Kategori'),
                             items: kategoriList
                                 .map((k) => DropdownMenuItem<int>(
@@ -103,14 +105,24 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                           ),
                         ),
                         const SizedBox(height: 12),
+
+                        // Denda & Stok
                         Row(
                           children: [
-                            Expanded(child: _decoratedTextField(dendaController, 'Denda', Icons.attach_money, isNumber: true)),
+                            Expanded(
+                                child: _decoratedTextField(
+                                    dendaController, 'Denda', Icons.attach_money,
+                                    isNumber: true)),
                             const SizedBox(width: 12),
-                            Expanded(child: _decoratedTextField(stokController, 'Stok', Icons.inventory, isNumber: true)),
+                            Expanded(
+                                child: _decoratedTextField(
+                                    stokController, 'Stok', Icons.inventory,
+                                    isNumber: true)),
                           ],
                         ),
                         const SizedBox(height: 12),
+
+                        // Dropdown Kondisi
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
@@ -118,16 +130,18 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: DropdownButtonFormField<String>(
-                            value: selectedKondisi,
+                            value: kondisiOptions.contains(selectedKondisi) ? selectedKondisi : null,
                             decoration: const InputDecoration(border: InputBorder.none, labelText: 'Kondisi'),
-                            items: kondisiOptions.map((k) => DropdownMenuItem<String>(
-                              value: k,
-                              child: Text(k),
-                            )).toList(),
+                            items: kondisiOptions
+                                .map((k) => DropdownMenuItem<String>(value: k, child: Text(k)))
+                                .toList(),
                             onChanged: (v) => setStateDialog(() => selectedKondisi = v!),
                           ),
                         ),
+
                         const SizedBox(height: 12),
+
+                        // Pilih Gambar
                         ElevatedButton.icon(
                           icon: const Icon(Icons.photo_camera, size: 22),
                           label: const Text('Pilih Gambar'),
@@ -167,6 +181,8 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Tombol Simpan & Batal
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -181,10 +197,13 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                           try {
                             String? finalGambarUrl = gambarUrl;
                             if (webImage != null) {
-                              final path = 'alat/${DateTime.now().millisecondsSinceEpoch}_$fileName';
+                              final path =
+                                  'alat/${DateTime.now().millisecondsSinceEpoch}_$fileName';
                               await supabase.storage.from('alat-images').uploadBinary(path, webImage!);
-                              finalGambarUrl = supabase.storage.from('alat-images').getPublicUrl(path);
+                              finalGambarUrl =
+                                  supabase.storage.from('alat-images').getPublicUrl(path);
                             }
+
                             final data = {
                               'nama_mesin': namaController.text,
                               'kategori_id': selectedKategori,
@@ -193,16 +212,20 @@ class _AlatCrudPageState extends State<AlatCrudPage> {
                               'kondisi': selectedKondisi,
                               'gambar': finalGambarUrl,
                             };
+
                             if (alat == null) {
                               await supabase.from('alat').insert(data);
                             } else {
                               await supabase.from('alat').update(data).eq('id', alat['id']);
                             }
+
                             Navigator.pop(context);
                             fetchAlat();
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Berhasil disimpan')));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(const SnackBar(content: Text('Berhasil disimpan')));
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(SnackBar(content: Text('Gagal: $e')));
                           }
                         },
                         child: const Text('Simpan'),

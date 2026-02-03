@@ -1,190 +1,123 @@
 import 'package:flutter/material.dart';
-import 'detail_peminjaman_page.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AdminPengembalianPage extends StatelessWidget {
+class AdminPengembalianPage extends StatefulWidget {
   const AdminPengembalianPage({super.key});
+
+  @override
+  State<AdminPengembalianPage> createState() => _AdminPengembalianPageState();
+}
+
+class _AdminPengembalianPageState extends State<AdminPengembalianPage> {
+  final supabase = Supabase.instance.client;
+
+  List<Map<String, dynamic>> pengembalianList = [];
+  List<Map<String, dynamic>> peminjamanList = [];
+  bool loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  // ================= FETCH DATA =================
+  Future<void> fetchData() async {
+    setState(() => loading = true);
+    try {
+      // Ambil data pengembalian
+      final pengembalianData = await supabase
+          .from('pengembalian')
+          .select('*')
+          .order('tgl_kembali', ascending: false);
+
+      // Ambil data peminjaman
+      final peminjamanData = await supabase
+          .from('peminjaman')
+          .select('*');
+
+      setState(() {
+        pengembalianList = List<Map<String, dynamic>>.from(pengembalianData);
+        peminjamanList = List<Map<String, dynamic>>.from(peminjamanData);
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat data: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ===== BG SESUAI PERMINTAAN =====
-      backgroundColor: const Color.fromARGB(255, 248, 247, 242),
-
-      body: Column(
-        children: [
-          // ===== HEADER CUSTOM =====
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-            decoration: const BoxDecoration(
-              color: Color(0xFF2A5191),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: Offset(0, 3),
-                )
-              ],
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Peminjaman',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // ===== LIST PEMINJAMAN =====
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _peminjamanItem(
-                  context,
-                  nama: 'Depina',
-                  kelas: 'XI TPM 1',
-                  alat: 'Mesin Bor',
-                  status: 'Dipinjam',
-                ),
-                const SizedBox(height: 12),
-                _peminjamanItem(
-                  context,
-                  nama: 'Andi',
-                  kelas: 'XI RPL 2',
-                  alat: 'Obeng',
-                  status: 'Kembali',
-                ),
-              ],
-            ),
-          ),
-        ],
+      backgroundColor: const Color(0xFFF8F7F2),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2A5191),
+        title: const Text('Pengembalian Alat'),
+        centerTitle: true,
       ),
-    );
-  }
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : pengembalianList.isEmpty
+              ? const Center(child: Text('Belum ada pengembalian'))
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: pengembalianList.length,
+                  itemBuilder: (context, index) {
+                    final pengembalian = pengembalianList[index];
 
-  Widget _peminjamanItem(
-    BuildContext context, {
-    required String nama,
-    required String kelas,
-    required String alat,
-    required String status,
-  }) {
-    Color statusColor =
-        status.toLowerCase() == 'dipinjam' ? Colors.orange : Colors.green;
+                    // Cocokkan peminjaman
+                    final peminjaman = peminjamanList.firstWhere(
+                      (pmj) => pmj['id'] == pengembalian['peminjaman_id'],
+                      orElse: () => {},
+                    );
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(18),
+                    final nama = peminjaman['user_id'] ?? 'Unknown';
+                    final alat = peminjaman['alat_id']?.toString() ?? 'Tidak ada';
+                    final status = peminjaman['status'] ?? 'Dipinjam';
+                    final tglKembali = pengembalian['tgl_kembali'] ?? '-';
 
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const DetailPeminjamanPage(),
-          ),
-        );
-      },
+                    Color statusColor =
+                        status.toLowerCase() == 'dikembalikan'
+                            ? Colors.green
+                            : Colors.orange;
 
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-        elevation: 3,
-        shadowColor: Colors.black26,
-
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-
-          child: Row(
-            children: [
-              // ===== AVATAR LEBIH CAKEP =====
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: const Color(0xFF2A5191).withOpacity(0.1),
-                child: const Icon(
-                  Icons.person,
-                  color: Color(0xFF2A5191),
-                ),
-              ),
-
-              const SizedBox(width: 16),
-
-              // ===== INFO =====
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      nama,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      kelas,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 13,
+                      elevation: 3,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: const Color(0xFF2A5191).withOpacity(0.1),
+                          child: const Icon(Icons.person, color: Color(0xFF2A5191)),
+                        ),
+                        title: Text(nama),
+                        subtitle: Text('Alat: $alat\nTgl Kembali: $tglKembali'),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            status,
+                            style: TextStyle(
+                              color: statusColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      'Alat: $alat',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              ),
-
-              // ===== STATUS =====
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      status,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: statusColor,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    const Icon(Icons.chevron_right, size: 18),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
