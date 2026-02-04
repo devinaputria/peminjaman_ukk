@@ -21,20 +21,19 @@ class _AdminPengembalianPageState extends State<AdminPengembalianPage> {
     fetchData();
   }
 
-  // ================= FETCH DATA =================
   Future<void> fetchData() async {
     setState(() => loading = true);
     try {
-      // Ambil data pengembalian
+      // Ambil data pengembalian terbaru
       final pengembalianData = await supabase
           .from('pengembalian')
           .select('*')
           .order('tgl_kembali', ascending: false);
 
-      // Ambil data peminjaman
+      // Ambil semua peminjaman beserta info alat
       final peminjamanData = await supabase
           .from('peminjaman')
-          .select('*');
+          .select('*, alat:alat_id(nama_mesin)');
 
       setState(() {
         pengembalianList = List<Map<String, dynamic>>.from(pengembalianData);
@@ -43,22 +42,33 @@ class _AdminPengembalianPageState extends State<AdminPengembalianPage> {
       });
     } catch (e) {
       setState(() => loading = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal memuat data: $e')),
-        );
-      }
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Gagal memuat data: $e')));
+    }
+  }
+
+  String formatTanggal(dynamic tgl) {
+    if (tgl == null) return '-';
+    try {
+      final d = DateTime.parse(tgl.toString());
+      return "${d.day}-${d.month}-${d.year}";
+    } catch (_) {
+      return tgl.toString();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F7F2),
+      backgroundColor: const Color(0xFFF3F6FB),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2A5191),
         title: const Text('Pengembalian Alat'),
         centerTitle: true,
+        elevation: 2,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        ),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
@@ -70,44 +80,99 @@ class _AdminPengembalianPageState extends State<AdminPengembalianPage> {
                   itemBuilder: (context, index) {
                     final pengembalian = pengembalianList[index];
 
-                    // Cocokkan peminjaman
+                    // Cari peminjaman sesuai sewa_id
                     final peminjaman = peminjamanList.firstWhere(
-                      (pmj) => pmj['id'] == pengembalian['peminjaman_id'],
+                      (pmj) => pmj['id'] == pengembalian['sewa_id'],
                       orElse: () => {},
                     );
 
-                    final nama = peminjaman['user_id'] ?? 'Unknown';
-                    final alat = peminjaman['alat_id']?.toString() ?? 'Tidak ada';
-                    final status = peminjaman['status'] ?? 'Dipinjam';
-                    final tglKembali = pengembalian['tgl_kembali'] ?? '-';
+                    // Nama user
+                    final namaUser =
+                        peminjaman['user_id'] ?? 'User tidak ditemukan';
 
-                    Color statusColor =
-                        status.toLowerCase() == 'dikembalikan'
-                            ? Colors.green
-                            : Colors.orange;
+                    // Nama alat
+                    final namaAlat =
+                        peminjaman['alat']?['nama_mesin'] ?? 'Tidak ada';
 
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 3,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF2A5191).withOpacity(0.1),
-                          child: const Icon(Icons.person, color: Color(0xFF2A5191)),
+                    final tglKembali =
+                        formatTanggal(pengembalian['tgl_kembali']);
+
+                    final kondisi =
+                        pengembalian['kondisi_kembali'] ?? 'Tidak ada data';
+
+                    final denda = pengembalian['denda'] ?? 0;
+
+                    // Status tampil
+                    String statusTampil = denda > 0 ? "Ada Denda" : "Sudah Dikembalikan";
+                    Color statusColor = denda > 0 ? Colors.red : Colors.green;
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.white, Colors.blue.shade50],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        title: Text(nama),
-                        subtitle: Text('Alat: $alat\nTgl Kembali: $tglKembali'),
-                        trailing: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
+                      ),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.15),
+                            color: const Color(0xFF2A5191).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          child: const Icon(
+                            Icons.assignment_return,
+                            color: Color(0xFF2A5191),
+                          ),
+                        ),
+                        title: Text(
+                          "User: $namaUser",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              infoText("Nama Alat", namaAlat),
+                              infoText("Kondisi", kondisi),
+                              infoText("Tgl Kembali", tglKembali),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Denda: Rp $denda",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: statusColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           child: Text(
-                            status,
+                            statusTampil,
                             style: TextStyle(
                               color: statusColor,
                               fontWeight: FontWeight.bold,
@@ -118,6 +183,16 @@ class _AdminPengembalianPageState extends State<AdminPengembalianPage> {
                     );
                   },
                 ),
+    );
+  }
+
+  Widget infoText(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 2),
+      child: Text(
+        "$label: $value",
+        style: const TextStyle(fontSize: 13),
+      ),
     );
   }
 }

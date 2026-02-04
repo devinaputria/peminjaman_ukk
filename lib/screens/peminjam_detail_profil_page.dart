@@ -1,230 +1,165 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class PeminjamProfilDetailPage extends StatefulWidget {
-  final String userId; // id user saat login
+class DetailPeminjamanPage extends StatefulWidget {
+  final Map<String, dynamic>? alat;
 
-  const PeminjamProfilDetailPage({super.key, required this.userId});
+  const DetailPeminjamanPage({Key? key, this.alat}) : super(key: key);
 
   @override
-  State<PeminjamProfilDetailPage> createState() =>
-      _PeminjamProfilDetailPageState();
+  State<DetailPeminjamanPage> createState() => _DetailPeminjamanPageState();
 }
 
-class _PeminjamProfilDetailPageState extends State<PeminjamProfilDetailPage> {
-  final _formKey = GlobalKey<FormState>();
+class _DetailPeminjamanPageState extends State<DetailPeminjamanPage> {
+  final _jumlahController = TextEditingController();
+  final _tanggalController = TextEditingController();
+  bool _loading = false;
 
-  final TextEditingController namaController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController telpController = TextEditingController();
+  Future<void> submitPeminjaman() async {
+    final jumlah = int.tryParse(_jumlahController.text.trim()) ?? 0;
+    final tanggal = _tanggalController.text.trim();
 
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-
-  // ================= Load data user dari Supabase =================
-  Future<void> _loadUserData() async {
-    try {
-      final response = await Supabase.instance.client
-          .from('users')
-          .select()
-          .eq('id', widget.userId)
-          .single();
-
-      if (response != null) {
-        namaController.text = response['nama'] ?? '';
-        emailController.text = response['email'] ?? '';
-        telpController.text = response['telp'] ?? '';
-      }
-    } catch (e) {
-      print("Error load user data: $e");
+    if (jumlah <= 0 || tanggal.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal mengambil data profil")),
+        const SnackBar(content: Text("Semua field harus diisi dengan benar")),
+      );
+      return;
+    }
+
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User belum login")),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      await Supabase.instance.client.from('peminjaman').insert({
+        'user_id': user.id,
+        'alat_id': widget.alat?['id'],
+        'jumlah': jumlah,
+        'tanggal_pengembalian': tanggal,
+        'status': 'menunggu',
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Peminjaman berhasil diajukan!")),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Gagal mengajukan peminjaman: $e")),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _loading = false);
     }
   }
 
-  // ================= Simpan perubahan ke Supabase =================
-  Future<void> _saveChanges() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    try {
-      await Supabase.instance.client.from('users').update({
-        'nama': namaController.text,
-        'email': emailController.text,
-        'telp': telpController.text,
-      }).eq('id', widget.userId);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profil berhasil diperbarui'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    } catch (e) {
-      print("Error update user: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Gagal menyimpan perubahan'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
+  InputDecoration _deco(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final alat = widget.alat;
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 248, 247, 242),
+      backgroundColor: const Color(0xFFF8F7F2),
       appBar: AppBar(
-        title: const Text(
-          'Detail & Edit Profil',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFF2A5191),
-        centerTitle: true,
-        elevation: 2,
+        backgroundColor: const Color(0xFF1E40AF),
+        title: Text(alat?['nama_mesin'] ?? 'Detail Peminjaman'),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: Form(
-                key: _formKey,
-                child: ListView(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Form Peminjaman',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
                   children: [
-                    const SizedBox(height: 20),
-
-                    Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
-                            )
-                          ],
-                        ),
-                        child: const CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Color(0xFF2A5191),
-                          child:
-                              Icon(Icons.person, size: 50, color: Colors.white),
-                        ),
-                      ),
+                    // Nama Alat (readonly)
+                    TextFormField(
+                      initialValue: alat?['nama_mesin'] ?? '',
+                      decoration: _deco('Alat', ''),
+                      readOnly: true,
                     ),
+                    const SizedBox(height: 12),
 
-                    const SizedBox(height: 24),
+                    // Jumlah
+                    TextField(
+                      controller: _jumlahController,
+                      keyboardType: TextInputType.number,
+                      decoration: _deco('Jumlah', 'Masukkan jumlah yang dipinjam'),
+                    ),
+                    const SizedBox(height: 12),
 
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 12,
-                            offset: Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // NAMA
-                          TextFormField(
-                            controller: namaController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nama Lengkap',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.person),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Nama tidak boleh kosong';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // EMAIL
-                          TextFormField(
-                            controller: emailController,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.email),
-                            ),
-                            validator: (value) {
-                              if (value == null || !value.contains('@')) {
-                                return 'Email tidak valid';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          // TELEPON
-                          TextFormField(
-                            controller: telpController,
-                            keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              labelText: 'No Telepon',
-                              border: OutlineInputBorder(),
-                              prefixIcon: Icon(Icons.phone),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.length < 10) {
-                                return 'No telepon tidak valid';
-                              }
-                              return null;
-                            },
-                          ),
-
-                          const SizedBox(height: 24),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2A5191),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                elevation: 4,
-                                shadowColor: Colors.black45,
-                              ),
-                              onPressed: _saveChanges,
-                              child: const Text(
-                                'Simpan Perubahan',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    // Tanggal Pengembalian
+                    TextField(
+                      controller: _tanggalController,
+                      decoration: _deco('Tanggal Pengembalian', 'YYYY-MM-DD'),
                     ),
                   ],
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+
+            SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: ElevatedButton(
+                onPressed: _loading ? null : submitPeminjaman,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1E40AF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  elevation: 2,
+                ),
+                child: _loading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                        'Ajukan Peminjaman',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Center(
+              child: Text(
+                'Pastikan semua data sudah benar sebelum mengajukan',
+                style: TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
