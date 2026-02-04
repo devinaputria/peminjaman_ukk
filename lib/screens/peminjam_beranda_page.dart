@@ -15,8 +15,6 @@ class PeminjamBerandaPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-
-              // ================= SALAM =================
               const Text(
                 'Halo, Peminjam 👋',
                 style: TextStyle(
@@ -25,9 +23,7 @@ class PeminjamBerandaPage extends StatelessWidget {
                   color: Color(0xff01386C),
                 ),
               ),
-
               const SizedBox(height: 4),
-
               const Text(
                 'Mau pinjam alat apa hari ini?',
                 style: TextStyle(
@@ -35,10 +31,7 @@ class PeminjamBerandaPage extends StatelessWidget {
                   fontSize: 16,
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // ================= BANNER =================
               Container(
                 height: 150,
                 decoration: BoxDecoration(
@@ -70,10 +63,7 @@ class PeminjamBerandaPage extends StatelessWidget {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // ================= GRID MENU =================
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
@@ -81,14 +71,10 @@ class PeminjamBerandaPage extends StatelessWidget {
                   crossAxisSpacing: 14,
                   mainAxisSpacing: 14,
                   children: [
-                    menuItem(
-                        context, Icons.build, 'Alat', AppRoutes.alat),
-                    menuItem(
-                        context, Icons.shopping_cart, 'Peminjaman', AppRoutes.peminjaman),
-                    menuItem(
-                        context, Icons.history, 'Riwayat', AppRoutes.riwayat),
-                    menuItem(
-                        context, Icons.person, 'Profil', AppRoutes.profilDetail),
+                    menuItem(context, Icons.build, 'Alat', AppRoutes.alat),
+                    menuItem(context, Icons.shopping_cart, 'Peminjaman', AppRoutes.peminjamanUser), // FIXED
+                    menuItem(context, Icons.history, 'Riwayat', AppRoutes.riwayat),
+                    menuItem(context, Icons.person, 'Profil', AppRoutes.profilDetail),
                   ],
                 ),
               ),
@@ -99,9 +85,7 @@ class PeminjamBerandaPage extends StatelessWidget {
     );
   }
 
-  // ================= WIDGET MENU =================
-  Widget menuItem(
-      BuildContext context, IconData icon, String label, String route) {
+  Widget menuItem(BuildContext context, IconData icon, String label, String route) {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, route),
       child: Card(
@@ -114,16 +98,14 @@ class PeminjamBerandaPage extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 26,
-              backgroundColor: const Color(0xFF2A5191).withOpacity(0.1),
+              backgroundColor: const Color.fromARGB(25, 42, 81, 145), // FIXED deprecated
               child: Icon(
                 icon,
                 color: const Color(0xFF2A5191),
                 size: 26,
               ),
             ),
-
             const SizedBox(height: 10),
-
             Text(
               label,
               style: const TextStyle(

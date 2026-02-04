@@ -85,9 +85,12 @@ class _DetailPeminjamanPageState extends State<DetailPeminjamanPage> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Alat: ${widget.namaAlat}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Alat: ${widget.namaAlat}',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             Text('Stok tersedia: ${widget.stok}'),
             const SizedBox(height: 12),
@@ -111,6 +114,7 @@ class _DetailPeminjamanPageState extends State<DetailPeminjamanPage> {
               ),
             ),
             const SizedBox(height: 24),
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

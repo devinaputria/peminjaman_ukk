@@ -6,6 +6,7 @@ import '../screens/peminjam_beranda_page.dart';
 import '../screens/peminjam_alat_page.dart';
 import '../screens/peminjam_riwayat_page.dart';
 import '../screens/peminjam_profil_page.dart';
+import '../screens/peminjam_peminjaman_page.dart'; // pastikan file ini ada
 
 // ADMIN
 import '../screens/admin_dashboard.dart';
@@ -27,6 +28,7 @@ class AppRoutes {
   // PEMINJAM
   static const String beranda = '/peminjam-beranda';
   static const String alat = '/peminjam-alat';
+  static const String peminjamanUser = '/peminjam-peminjaman'; // route peminjaman
   static const String riwayat = '/peminjam-riwayat';
   static const String profilDetail = '/peminjam-profil';
 
@@ -50,6 +52,7 @@ class AppRoutes {
         // PEMINJAM
         beranda: (_) => const PeminjamBerandaPage(),
         alat: (_) => const AlatPage(),
+        peminjamanUser: (_) => const PeminjamanPage(), // route Peminjaman
         riwayat: (_) => const RiwayatPage(),
         profilDetail: (_) => const PeminjamProfilPage(),
 
